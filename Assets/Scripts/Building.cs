@@ -1,0 +1,122 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Events;
+
+
+public class Building : MonoBehaviour
+{
+    // Start is called before the first frame update
+    public Vector3 gridPosition;
+    public Vector3 offset;
+    public float width;
+    public float height;
+    [HideInInspector]
+    public Vector3 center;
+    [HideInInspector]
+    public IsometricGrid grid;
+    public bool mouseDown = false;
+    public SpriteRenderer buildingRenderer;
+    [HideInInspector]
+    public List<IsometricTile> usingTiles = new List<IsometricTile>();
+    public bool editing = false;
+    public UnityEvent isEditing;
+    public UnityEvent completeEditing;
+    public UnityEvent stopEditing;
+    private Vector3 lastMousePosition;
+    public UnityEvent onMouseDown;
+    public Transform outlines;
+
+
+    void Start(){
+        getSpriteCenter();
+        transform.Find("EditButtons/Vinkje").gameObject.GetComponent<GameObjectButton>().onMouseDown.AddListener(OnCompleteEditing);
+        transform.Find("EditButtons/Kruisje").gameObject.GetComponent<GameObjectButton>().onMouseDown.AddListener(OnStopEditing);
+    }
+    void OnMouseEnter(){
+    
+    }
+    void OnMouseDown(){
+        onMouseDown.Invoke();
+        mouseDown = true;
+        
+        if(editing){
+            Camera.main.GetComponent<CameraScript>().canMove=false;
+        }else{
+            Invoke("checkIfEdit",0.8f);
+            lastMousePosition = Input.mousePosition;
+        }
+        
+    }
+    void OnMouseUp(){
+        Camera.main.GetComponent<CameraScript>().canMove=true;
+        mouseDown = false;
+    }
+    void Update(){
+        if(Input.GetMouseButtonUp(0)){
+            OnMouseUp();
+        }
+        if(editing && mouseDown){
+            gridPosition=grid.getClosestGridPosition(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+            grid.changePositionOfBuilding(gameObject);
+        }
+    }
+    public Vector3 getSpriteCenter(){
+        SpriteRenderer SR = gameObject.GetComponent<SpriteRenderer>();
+        center = new Vector3(width/2, height/2,0);
+        return center;
+    }
+        /*
+        int tileCounter = 0;
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                tileCounter+=1;
+                averageOffset+=new Vector2(x,y);
+            }
+        }
+        averageOffset/=tileCounter;
+        gridRenderPosition = gridPosition+averageOffset;
+        Debug.Log("Building says : "+gridRenderPosition.x+" , "+gridRenderPosition.y);
+        */
+    private void checkIfEdit(){
+        if(mouseDown && lastMousePosition==Input.mousePosition){
+            startEditing();
+            
+        }
+    }
+    public void startEditing(){
+        showEditButtons();
+        isEditing.Invoke();
+        
+    }
+    public void OnCompleteEditing(){
+        editing = false;
+        completeEditing.Invoke();
+        hideEditButtons();
+    }
+    public void OnStopEditing(){
+        editing = false;
+        stopEditing.Invoke();
+        hideEditButtons();
+
+    }
+    public void showEditButtons(){
+        transform.Find("EditButtons").localScale = new Vector3(0.1f,0.1f,0.1f);
+    }
+    public void hideEditButtons(){
+        transform.Find("EditButtons").localScale = new Vector3(0f,0f,0f);
+    }
+    public void onVinkjeMouseClick(){
+        Debug.Log("neeeej");
+    }
+    public void startSelected(){
+        outlines.localScale = new Vector3(1f,1f,1f);
+    }
+    public void stopSelected(){
+        outlines.localScale = new Vector3(0f,0f,0f);
+    }
+
+}
+ 

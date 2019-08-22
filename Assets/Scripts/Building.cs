@@ -25,13 +25,17 @@ public class Building : MonoBehaviour
     public UnityEvent stopEditing;
     private Vector3 lastMousePosition;
     public UnityEvent onMouseDown;
+    public UnityEvent removeBuilding;
     public Transform outlines;
+    public Vector3 lastGridPosition = new Vector3(-1f,-1f,-1f);
+    
 
 
     void Start(){
         getSpriteCenter();
         transform.Find("EditButtons/Vinkje").gameObject.GetComponent<GameObjectButton>().onMouseDown.AddListener(OnCompleteEditing);
         transform.Find("EditButtons/Kruisje").gameObject.GetComponent<GameObjectButton>().onMouseDown.AddListener(OnStopEditing);
+        transform.Find("EditButtons/InInventory").gameObject.GetComponent<GameObjectButton>().onMouseDown.AddListener(OnInInventory);
     }
     void OnMouseEnter(){
     
@@ -102,15 +106,17 @@ public class Building : MonoBehaviour
         hideEditButtons();
 
     }
+    public void OnInInventory(){
+        removeBuilding.Invoke();
+        //Debug.Log("wtf");
+    }
     public void showEditButtons(){
         transform.Find("EditButtons").localScale = new Vector3(0.1f,0.1f,0.1f);
     }
     public void hideEditButtons(){
         transform.Find("EditButtons").localScale = new Vector3(0f,0f,0f);
     }
-    public void onVinkjeMouseClick(){
-        Debug.Log("neeeej");
-    }
+
     public void startSelected(){
         outlines.localScale = new Vector3(1f,1f,1f);
     }

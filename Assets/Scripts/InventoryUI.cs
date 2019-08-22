@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
+using TMPro;
+
 
 
 public class InventoryUI : MonoBehaviour
@@ -17,7 +19,7 @@ public class InventoryUI : MonoBehaviour
     void Start()
     {
         //main.inventory.addItem("Ground3x2",1);
-        main.inventory.addItem("Ground3x1",1);
+        main.inventory.addItem("Ground3x1",10);
         refreshUI();
     }
 
@@ -36,7 +38,7 @@ public class InventoryUI : MonoBehaviour
             
             GameObject itemPrefab = (GameObject)Resources.Load("Prefabs/"+item.prefabName);
             GameObject newItem = GameObject.Instantiate(sample);
-            Debug.Log(itemPrefab);
+            //Debug.Log(itemPrefab);
             
             
             //newItem.GetComponent<EventTrigger>().triggers.PointerDown.AddListener(delegate{itemDown(newItem);});
@@ -46,27 +48,29 @@ public class InventoryUI : MonoBehaviour
             newItem.transform.localScale = Vector3.one;
             newItem.GetComponent<InventoryItemUI>().contentTransform = content;
             newItem.GetComponent<InventoryItemUI>().inventoryTransform = gameObject.GetComponent<RectTransform>();
-            newItem.GetComponent<InventoryItemUI>().placedOnGrid.AddListener(delegate{onPlaceOnGrid(item);});
+            newItem.GetComponent<InventoryItemUI>().placedOnGrid.AddListener(delegate{onPlaceOnGrid(item, newItem);});
             
             newItem.GetComponent<InventoryItemUI>().prefabName = item.prefabName;
+            newItem.transform.Find("Amount").gameObject.GetComponent<TMP_Text>().text = item.amount.ToString();
 
             //LayoutRebuilder.ForceRebuildLayoutImmediate(content);
             newItem.transform.Find("Image").GetComponent<Image>().sprite=itemPrefab.GetComponent<Building>().buildingRenderer.sprite;
         }
     }
 
-    public void onPlaceOnGrid(InventoryItem item){
+    public void onPlaceOnGrid(InventoryItem item, GameObject itemUI){
         GameObject itemPrefab = (GameObject)Resources.Load("Prefabs/"+item.prefabName);
         //itemPrefab.GetComponent<Building>().mouseDown = true;
         
-        GameObject itemGameObject = main.grid.placeBuilding(itemPrefab,new Vector3(0,0,0));
+        GameObject itemGameObject = main.grid.placeBuilding(itemPrefab,new Vector3(-1,-1,-1));
         //itemGameObject.GetComponent<Building>().isEditing.AddListener(delegate{onIsEditing(itemGameObject);});
         //itemGameObject.GetComponent<Building>().completeEditing.AddListener(delegate{onCompleteEditing(itemGameObject);});
         //itemGameObject.GetComponent<Building>().stopEditing.AddListener(delegate{onStopEditing(itemGameObject);});
         itemGameObject.GetComponent<Building>().startEditing();
         itemGameObject.GetComponent<Building>().mouseDown=true;
         main.inventory.removeItem(itemGameObject.name.Replace("(Clone)",""));
-
+        Destroy(itemUI);
+        refreshUI();
     }
     /*
     public void onIsEditing(GameObject buildingGameObject){

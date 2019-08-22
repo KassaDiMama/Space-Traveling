@@ -25,6 +25,9 @@ public class CameraScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(Input.GetMouseButtonUp(0)){
+            mouseDown=false;
+        }
         if(canMove && !eventSystem.IsPointerOverGameObject()){
             if (Application.platform == RuntimePlatform.WindowsEditor){
                 if(Input.GetMouseButtonDown(0)){
@@ -39,9 +42,7 @@ public class CameraScript : MonoBehaviour
                     Camera.main.transform.Translate(newPosition.x,newPosition.y,0);
                 }
                 
-                if(Input.GetMouseButtonUp(0)){
-                    mouseDown=false;
-                }
+                
             }else{
                 if (Input.touchCount == 1) {
                     Touch touch = Input.GetTouch(0);
@@ -57,5 +58,6 @@ public class CameraScript : MonoBehaviour
                 } 
             }
         }
+        
     }
 }

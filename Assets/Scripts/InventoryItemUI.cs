@@ -19,6 +19,7 @@ public class InventoryItemUI : MonoBehaviour
     public RectTransform inventoryTransform;
     [HideInInspector]
     public UnityEvent placedOnGrid = new UnityEvent();
+    private bool moving;
     void Start()
     {
         EventTrigger trigger = GetComponent<EventTrigger>();
@@ -55,7 +56,11 @@ public class InventoryItemUI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(itemDown){
+        if(itemDown && !itemEntered && !moving){
+            moving = true;
+            gameObject.transform.SetParent(GetComponentInParent<Canvas>().transform,false);
+        }
+        if(itemDown && moving){
             Vector2 pos;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(GetComponentInParent<Canvas>().transform as RectTransform, Input.mousePosition, GetComponentInParent<Canvas>().worldCamera, out pos);
             transform.position = GetComponentInParent<Canvas>().transform.TransformPoint(pos);
@@ -65,13 +70,12 @@ public class InventoryItemUI : MonoBehaviour
             if(!inventoryTransform.rect.Contains(pos) && !onGrid){
                 onGrid=true;
                 placedOnGrid.Invoke();
-                Destroy(gameObject);
+                //Destroy(gameObject);
             }
         }
     }
     public void onItemDown(BaseEventData eventData){
-        Debug.Log("Down");
-        gameObject.transform.SetParent(GetComponentInParent<Canvas>().transform,false);
+        //gameObject.transform.SetParent(GetComponentInParent<Canvas>().transform,false);
         itemDown = true;
 
     }
@@ -79,12 +83,13 @@ public class InventoryItemUI : MonoBehaviour
         Vector2 pos;
         RectTransformUtility.ScreenPointToLocalPointInRectangle(inventoryTransform as RectTransform, Input.mousePosition, GetComponentInParent<Canvas>().worldCamera, out pos);
         //transform.position = inventoryTransform.TransformPoint(pos);
-        Debug.Log(inventoryTransform.TransformPoint(Input.mousePosition));
-        Debug.Log(inventoryTransform.rect);
+        //Debug.Log(inventoryTransform.TransformPoint(Input.mousePosition));
+        //Debug.Log(inventoryTransform.rect);
         if(inventoryTransform.rect.Contains(pos)){
             gameObject.transform.SetParent(contentTransform);
         }
         itemDown = false;
+        moving=false;
     }
 
     public void onItemBeginDrag(BaseEventData eventData){

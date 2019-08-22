@@ -33,6 +33,7 @@ public class Main : MonoBehaviour
         building.isEditing.AddListener(delegate{onIsEditing(building.gameObject);});
         building.completeEditing.AddListener(delegate{onCompleteEditing(building.gameObject);});
         building.stopEditing.AddListener(delegate{onStopEditing(building.gameObject);});
+        building.removeBuilding.AddListener(delegate{onRemoveBuilding(building.gameObject);});
         
 
     }
@@ -44,36 +45,69 @@ public class Main : MonoBehaviour
             building.editing=true;
             Camera.main.GetComponent<CameraScript>().canMove=false;
             
+        }else{
+            onCompleteEditing(currentlyEditing.gameObject);
+            Building building = buildingGameObject.GetComponent<Building>();
+            currentlyEditing = building;
+            building.editing=true;
+            Camera.main.GetComponent<CameraScript>().canMove=false;
         }
+        Debug.Log("ohnono");
     }
     public void onCompleteEditing(GameObject buildingGameObject){
         Building building = buildingGameObject.GetComponent<Building>();
         Camera.main.GetComponent<CameraScript>().canMove=true;
         currentlyEditing = null;
-        if(grid.isOnBuilding(building) || !grid.canMoveTo(building)){
-            Destroy(buildingGameObject);
-            inventory.addItem(buildingGameObject.name.Replace("(Clone)",""));
-            inventoryUI.refreshUI();
-            grid.removeBuilding(building);
+        if(!grid.isOnBoard(building) || grid.isOnBuilding(building)){
+            if(building.lastGridPosition.x != -1f){
+                building.gridPosition = building.lastGridPosition;
+                grid.changePositionOfBuilding(building.gameObject);
+                currentlyEditing = null;
+                Camera.main.GetComponent<CameraScript>().canMove=true;
+                building.hideEditButtons();
+                building.editing=false;
+                
+            }else{
+                Camera.main.GetComponent<CameraScript>().canMove=true;
+                currentlyEditing = null;
+                Destroy(buildingGameObject);
+                inventory.addItem(buildingGameObject.name.Replace("(Clone)",""));
+                inventoryUI.refreshUI();
+                grid.removeBuilding(building);
+            }
             
+        }else{
+            building.lastGridPosition = building.gridPosition;
+            grid.changePositionOfBuilding(building.gameObject);
+            currentlyEditing = null;
+            Camera.main.GetComponent<CameraScript>().canMove=true;
+            building.hideEditButtons();
+            building.editing=false;
         }
         
     }
     public void onStopEditing(GameObject buildingGameObject){
         Building building = buildingGameObject.GetComponent<Building>();
-        Camera.main.GetComponent<CameraScript>().canMove=true;
-        currentlyEditing = null;
-        Destroy(buildingGameObject);
-        inventory.addItem(buildingGameObject.name.Replace("(Clone)",""));
-        inventoryUI.refreshUI();
-        grid.removeBuilding(building);
+        if(building.lastGridPosition.x == -1f){
+            Camera.main.GetComponent<CameraScript>().canMove=true;
+            currentlyEditing = null;
+            Destroy(buildingGameObject);
+            inventory.addItem(buildingGameObject.name.Replace("(Clone)",""));
+            inventoryUI.refreshUI();
+            grid.removeBuilding(building);
+        }else{
+            building.gridPosition = building.lastGridPosition;
+            grid.changePositionOfBuilding(building.gameObject);
+            currentlyEditing = null;
+            Camera.main.GetComponent<CameraScript>().canMove=true;
+        }
         
 
         
     }
     
     public void OnBuildingMouseDown(Building building){
-        Debug.Log("Down building");
+        //Debug.Log(building.gameObject.name);
         if(currentlySelected == null){
             currentlySelected = building;
             building.startSelected();
@@ -82,5 +116,13 @@ public class Main : MonoBehaviour
             currentlySelected = building;
             building.startSelected();
         }
+    }
+    public void onRemoveBuilding(GameObject buildingGameObject){
+        Camera.main.GetComponent<CameraScript>().canMove=true;
+        currentlyEditing = null;
+        Destroy(buildingGameObject);
+        inventory.addItem(buildingGameObject.name.Replace("(Clone)",""));
+        inventoryUI.refreshUI();
+        grid.removeBuilding(buildingGameObject.GetComponent<Building>());
     }
 }

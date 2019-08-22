@@ -49,7 +49,7 @@ public class IsometricGrid
         }
 
     }
-    public bool canMoveTo(Building building){
+    public bool isOnBoard(Building building){
         int x = (int)building.gridPosition.x;
         int y = (int)building.gridPosition.y;
         int sizeX = (int)building.width;
@@ -106,27 +106,33 @@ public class IsometricGrid
         buildingPosition.y = (buildingGridPosition.x-buildingGridPosition.y)* 0.25f * tileWidth;
         Debug.Log(building.getSpriteCenter());
         */
+        
         GameObject buildingInstance = GameObject.Instantiate(buildingGameObject);
-        buildingInstance.GetComponent<Building>().grid = this;
-        buildingInstance.GetComponent<Building>().gridPosition = gridPosition;
+        Building building = buildingInstance.GetComponent<Building>();
+        building.grid = this;
+        building.gridPosition = gridPosition;
         
         //buildingInstance.GetComponent<Building>().startEditing();
         //buildingInstance.transform.position = buildingPosition;
         changePositionOfBuilding(buildingInstance);
+        if(isOnBoard(building) && !isOnBuilding(building)){
+            building.lastGridPosition = building.gridPosition;
+        }
         buildingPlaced.Invoke(buildingInstance.GetComponent<Building>());
         return buildingInstance;
     }
     public void changePositionOfBuilding(GameObject buildingGameObject){
         
         Building building = buildingGameObject.GetComponent<Building>();
-        if(canMoveTo(building)){
-            foreach (IsometricTile tile in building.usingTiles)
-            {
-                tile.gridPicture.GetComponent<SpriteRenderer>().color = Color.black;
-                tile.building=null;
-                
-            }
-            building.usingTiles.Clear();
+        //if(isOnBoard(building)){
+        foreach (IsometricTile tile in building.usingTiles)
+        {
+            tile.gridPicture.GetComponent<SpriteRenderer>().color = Color.black;
+            tile.building=null;
+            
+        }
+        building.usingTiles.Clear();
+        if(isOnBoard(building)){
             for (int x = (int)building.gridPosition.x; x < building.gridPosition.x+building.width; x++)
             {
                 for (int y = (int)building.gridPosition.y; y < building.gridPosition.y+building.height; y++)
@@ -138,21 +144,22 @@ public class IsometricGrid
                     }
                 }
             }
-            //if(canPlaceOn(building.gridPosition.x,building.gridPosition.y))
-            Vector3 buildingGridPosition = building.gridPosition+building.offset;
-            Vector3 buildingPosition= new Vector3();
-            buildingPosition.x = (buildingGridPosition.x+buildingGridPosition.y)* 0.5f * tileWidth;
-            buildingPosition.y = (buildingGridPosition.x-buildingGridPosition.y)* 0.25f * tileWidth;
-            building.transform.position = buildingPosition;
-            //int sortingOrder = (int)(Mathf.Pow(size,2)-Mathf.Round(Mathf.Sqrt(Mathf.Pow(0f-buildingGridPosition.x,2f)+Mathf.Pow(size-buildingGridPosition.y,2f))));
-            int sortingOrder = (int) (size*size - buildingGridPosition.x);
-            building.buildingRenderer.sortingOrder=sortingOrder;
-            if(isOnBuilding(building)){
-                building.buildingRenderer.color = Color.red;
-            }else{
-                building.buildingRenderer.color = Color.white;
-            }
         }
+        //if(canPlaceOn(building.gridPosition.x,building.gridPosition.y))
+        Vector3 buildingGridPosition = building.gridPosition+building.offset;
+        Vector3 buildingPosition= new Vector3();
+        buildingPosition.x = (buildingGridPosition.x+buildingGridPosition.y)* 0.5f * tileWidth;
+        buildingPosition.y = (buildingGridPosition.x-buildingGridPosition.y)* 0.25f * tileWidth;
+        building.transform.position = buildingPosition;
+        //int sortingOrder = (int)(Mathf.Pow(size,2)-Mathf.Round(Mathf.Sqrt(Mathf.Pow(0f-buildingGridPosition.x,2f)+Mathf.Pow(size-buildingGridPosition.y,2f))));
+        int sortingOrder = (int) (size*size - buildingGridPosition.x);
+        building.buildingRenderer.sortingOrder=sortingOrder;
+        if(!isOnBoard(building) || isOnBuilding(building)){
+            building.buildingRenderer.color = Color.red;
+        }else{
+            building.buildingRenderer.color = Color.white;
+        }
+        //}
     }
     public Vector3 getClosestGridPosition(Vector3 position){
         

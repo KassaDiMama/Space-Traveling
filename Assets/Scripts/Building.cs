@@ -26,8 +26,10 @@ public class Building : MonoBehaviour
     private Vector3 lastMousePosition;
     public UnityEvent onMouseDown;
     public UnityEvent removeBuilding;
+    public UnityEvent hasRotated;
     public Transform outlines;
     public Vector3 lastGridPosition = new Vector3(-1f,-1f,-1f);
+    public bool rotated;
     
 
 
@@ -36,6 +38,7 @@ public class Building : MonoBehaviour
         transform.Find("EditButtons/Vinkje").gameObject.GetComponent<GameObjectButton>().onMouseDown.AddListener(OnCompleteEditing);
         transform.Find("EditButtons/Kruisje").gameObject.GetComponent<GameObjectButton>().onMouseDown.AddListener(OnStopEditing);
         transform.Find("EditButtons/InInventory").gameObject.GetComponent<GameObjectButton>().onMouseDown.AddListener(OnInInventory);
+        transform.Find("EditButtons/Rotation").gameObject.GetComponent<GameObjectButton>().onMouseDown.AddListener(OnRotation);
     }
     void OnMouseEnter(){
     
@@ -109,6 +112,23 @@ public class Building : MonoBehaviour
     public void OnInInventory(){
         removeBuilding.Invoke();
         //Debug.Log("wtf");
+    }
+    public void OnRotation(){
+        //Debug.Log("Before: widht-"+width+" height-"+height);
+        width += height;
+        height = width - height;
+        width -= height;
+        offset.x+=offset.y;
+        offset.y = offset.x-offset.y;
+        offset.x-=offset.y;
+        //Debug.Log("After: widht-"+width+" height-"+height);
+        GetComponent<SpriteRenderer>().flipX = !GetComponent<SpriteRenderer>().flipX;
+        if(GetComponent<SpriteRenderer>()!=buildingRenderer){
+            buildingRenderer.flipX = !buildingRenderer.flipX;
+        }
+        outlines.gameObject.GetComponent<SpriteRenderer>().flipX = !outlines.gameObject.GetComponent<SpriteRenderer>().flipX;
+        rotated = !rotated;
+        hasRotated.Invoke();
     }
     public void showEditButtons(){
         transform.Find("EditButtons").localScale = new Vector3(0.1f,0.1f,0.1f);

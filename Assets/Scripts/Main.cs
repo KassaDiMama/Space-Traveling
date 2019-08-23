@@ -10,6 +10,7 @@ public class Main : MonoBehaviour
     public Building currentlyEditing;
     public Building currentlySelected;
     public InventoryUI inventoryUI;
+    public Transform gridParent;
     void Start()
     {
         GameObject gridSprite = (GameObject)Resources.Load("Prefabs/Grid");
@@ -17,7 +18,8 @@ public class Main : MonoBehaviour
         float widthWithEdgesMerged = width*0.95f;
         grid = new IsometricGrid(10,widthWithEdgesMerged);
         grid.buildingPlaced.AddListener(OnBuildingPlaced);
-        grid.placeGrid();
+        grid.placeGrid(gridParent);
+        hideGrid();
         
         grid.placeBuilding((GameObject)Resources.Load("Prefabs/Ground3x2"),new Vector3(0,3,0));
         //grid.placeBuilding((GameObject)Resources.Load("Prefabs/Ground3x2"));
@@ -34,6 +36,7 @@ public class Main : MonoBehaviour
         building.completeEditing.AddListener(delegate{onCompleteEditing(building.gameObject);});
         building.stopEditing.AddListener(delegate{onStopEditing(building.gameObject);});
         building.removeBuilding.AddListener(delegate{onRemoveBuilding(building.gameObject);});
+        building.hasRotated.AddListener(delegate{onRotatedBuilding(building.gameObject);});
         
 
     }
@@ -52,7 +55,8 @@ public class Main : MonoBehaviour
             building.editing=true;
             Camera.main.GetComponent<CameraScript>().canMove=false;
         }
-        Debug.Log("ohnono");
+        showGrid();
+        //Debug.Log("ohnono");
     }
     public void onCompleteEditing(GameObject buildingGameObject){
         Building building = buildingGameObject.GetComponent<Building>();
@@ -60,6 +64,10 @@ public class Main : MonoBehaviour
         currentlyEditing = null;
         if(!grid.isOnBoard(building) || grid.isOnBuilding(building)){
             if(building.lastGridPosition.x != -1f){
+                if(building.rotated){
+                    building.OnRotation();
+                    building.rotated=false;
+                }
                 building.gridPosition = building.lastGridPosition;
                 grid.changePositionOfBuilding(building.gameObject);
                 currentlyEditing = null;
@@ -68,6 +76,7 @@ public class Main : MonoBehaviour
                 building.editing=false;
                 
             }else{
+                
                 Camera.main.GetComponent<CameraScript>().canMove=true;
                 currentlyEditing = null;
                 Destroy(buildingGameObject);
@@ -77,6 +86,7 @@ public class Main : MonoBehaviour
             }
             
         }else{
+            
             building.lastGridPosition = building.gridPosition;
             grid.changePositionOfBuilding(building.gameObject);
             currentlyEditing = null;
@@ -84,6 +94,7 @@ public class Main : MonoBehaviour
             building.hideEditButtons();
             building.editing=false;
         }
+        hideGrid();
         
     }
     public void onStopEditing(GameObject buildingGameObject){
@@ -96,11 +107,16 @@ public class Main : MonoBehaviour
             inventoryUI.refreshUI();
             grid.removeBuilding(building);
         }else{
+            if(building.rotated){
+                building.OnRotation();
+                building.rotated=false;
+            }
             building.gridPosition = building.lastGridPosition;
             grid.changePositionOfBuilding(building.gameObject);
             currentlyEditing = null;
             Camera.main.GetComponent<CameraScript>().canMove=true;
         }
+        hideGrid();
         
 
         
@@ -124,5 +140,15 @@ public class Main : MonoBehaviour
         inventory.addItem(buildingGameObject.name.Replace("(Clone)",""));
         inventoryUI.refreshUI();
         grid.removeBuilding(buildingGameObject.GetComponent<Building>());
+        hideGrid();
+    }
+    public void onRotatedBuilding(GameObject buildingGameObject){
+        grid.changePositionOfBuilding(buildingGameObject);
+    }
+    public void showGrid(){
+        gridParent.localScale = new Vector3(1,1,1);
+    }
+    public void hideGrid(){
+        gridParent.localScale = new Vector3(0,0,0);
     }
 }

@@ -83,7 +83,7 @@ public class IsometricGrid
         }
         return false;
     }
-    public void placeGrid(){
+    public void placeGrid(Transform parent){
         for (int x = 0;x < grid.GetLength(0);x++)
         {
             for (int y = 0;y < grid.GetLength(1);y++)
@@ -94,6 +94,7 @@ public class IsometricGrid
                 IsometricTile currentTile = grid[x,y];
                 GameObject clone = GameObject.Instantiate(textMesh, new Vector3(currentTile.position.x, currentTile.position.y, 0), Quaternion.identity);
                 currentTile.gridPicture=clone;
+                clone.transform.SetParent(parent);
             }
         }
     }
@@ -132,6 +133,7 @@ public class IsometricGrid
             
         }
         building.usingTiles.Clear();
+        //Debug.Log("Grid: width="+building.width+" height="+building.height);
         if(isOnBoard(building)){
             for (int x = (int)building.gridPosition.x; x < building.gridPosition.x+building.width; x++)
             {

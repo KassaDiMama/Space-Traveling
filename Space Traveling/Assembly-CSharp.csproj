@@ -70,7 +70,11 @@
      <Compile Include="Assets\Scripts\Inventory.cs" />
      <Compile Include="Assets\Scripts\InventoryItemUI.cs" />
      <Compile Include="Assets\Scripts\InventoryUI.cs" />
+     <Compile Include="Assets\Scripts\LoadingManager.cs" />
      <Compile Include="Assets\Scripts\Main.cs" />
+     <Compile Include="Assets\Scripts\NetworkManager.cs" />
+     <Compile Include="Assets\Scripts\TCP.cs" />
+     <Compile Include="Assets\Scripts\UnityMainThreadDispatcher.cs" />
      <Compile Include="Assets\Scripts\World.cs" />
      <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface-Mobile.shader" />
      <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />

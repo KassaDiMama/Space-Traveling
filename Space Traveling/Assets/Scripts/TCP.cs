@@ -35,7 +35,7 @@ public class TCP
 
         }
     }
-    void readMessages()
+    public void readMessages()
     {
         if (client != null)
         {

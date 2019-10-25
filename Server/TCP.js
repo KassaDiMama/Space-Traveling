@@ -1,6 +1,7 @@
 const net = require('net');
 const port = 33333;
 const host = '0.0.0.0';
+const messages = require("./Messages");
 
 const server = net.createServer();
 server.listen(port, host, () => {
@@ -14,11 +15,11 @@ server.on('connection', function (sock) {
     users.push(sock);
 
     sock.on('data', function (data) {
-        console.log('DATA ' + sock.remoteAddress + ': ' + data);
+        //console.log('DATA ' + sock.remoteAddress + ': ' + data);
         // Write the data back to all the connected, the client will receive it as data from the server
-        users.forEach(function (sock, index, array) {
-            sock.write(sock.remoteAddress + ':' + sock.remotePort + " said " + data + '\n');
-        });
+        var messageObject = messages.Message.Deserialize(data);
+        messageObject.socket = sock;
+        messageObject.onReceive();
     });
     sock.on("close", function () {
         console.log('DISCONNECTED: ' + sock.remoteAddress + ':' + sock.remotePort);

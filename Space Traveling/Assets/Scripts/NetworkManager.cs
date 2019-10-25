@@ -16,13 +16,18 @@ public class NetworkManager : MonoBehaviour
     {
         DontDestroyOnLoad(gameObject);
         //DontDestroyOnLoad(UMTD.gameObject);
-        onServerConnect.AddListener(delegate { ping(); });
+        tcp.messageReceived.AddListener(onMessageReceived);
     }
 
     // Update is called once per frame
     void Update()
     {
         //Debug.Log(onServerConnect.GetPersistentEventCount());
+        if (tcp.isConnected())
+        {
+            tcp.readMessages();
+        }
+
     }
 
     public void Connect(string host, int port)
@@ -52,5 +57,15 @@ public class NetworkManager : MonoBehaviour
     public void ping()
     {
         Debug.Log("Ping");
+    }
+
+    public void sendMessage(string message)
+    {
+        tcp.sendMessage(message);
+    }
+    private void onMessageReceived(string message)
+    {
+        var messageObject = Message.Deserialize(message);
+        messageObject.onReceive();
     }
 }

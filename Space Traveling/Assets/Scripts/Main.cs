@@ -13,165 +13,204 @@ public class Main : MonoBehaviour
     public Transform gridParent;
     public CenterPanel centerPanel;
     public bool editing = false;
+    private NetworkManager networkManager;
     void Start()
     {
+        networkManager = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
         GameObject gridSprite = (GameObject)Resources.Load("Prefabs/Grid");
         float width = gridSprite.GetComponent<Renderer>().bounds.size.x;
-        float widthWithEdgesMerged = width*0.95f;
-        grid = new IsometricGrid(10,widthWithEdgesMerged);
+        float widthWithEdgesMerged = width * 0.95f;
+        grid = new IsometricGrid(20, 10, widthWithEdgesMerged);
         grid.buildingPlaced.AddListener(OnBuildingPlaced);
         grid.placeGrid(gridParent);
-        if(!centerPanel.inventoryUp){
+        if (!centerPanel.inventoryUp)
+        {
             hideGrid();
         }
-    
-        
-        grid.placeBuilding((GameObject)Resources.Load("Prefabs/Ground3x2"),new Vector3(0,3,0));
+
+
+        grid.placeBuilding((GameObject)Resources.Load("Prefabs/Ground3x2"), new Vector3(0, 3, 0));
+        BaseInformation baseInformation = new BaseInformation();
+        baseInformation.baseData = grid.Serialize();
+        networkManager.sendMessage(baseInformation.Serialize());
         //grid.placeBuilding((GameObject)Resources.Load("Prefabs/Ground3x2"));
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetMouseButtonDown(0)){
-            if(currentlyEditing==null){
-                if(currentlySelected!=null){
-                    if(currentlySelected.mouseDown==false){
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (currentlyEditing == null)
+            {
+                if (currentlySelected != null)
+                {
+                    if (currentlySelected.mouseDown == false)
+                    {
                         currentlySelected.stopSelected();
                     }
                 }
             }
         }
     }
-    public void OnBuildingPlaced(Building building){
-        building.onMouseDown.AddListener(delegate{OnBuildingMouseDown(building);});
-        building.isEditing.AddListener(delegate{onIsEditing(building.gameObject);});
-        building.completeEditing.AddListener(delegate{onCompleteEditing(building.gameObject);});
-        building.stopEditing.AddListener(delegate{onStopEditing(building.gameObject);});
-        building.removeBuilding.AddListener(delegate{onRemoveBuilding(building.gameObject);});
-        building.hasRotated.AddListener(delegate{onRotatedBuilding(building.gameObject);});
-        
+    public void OnBuildingPlaced(Building building)
+    {
+        building.onMouseDown.AddListener(delegate { OnBuildingMouseDown(building); });
+        building.isEditing.AddListener(delegate { onIsEditing(building.gameObject); });
+        building.completeEditing.AddListener(delegate { onCompleteEditing(building.gameObject); });
+        building.stopEditing.AddListener(delegate { onStopEditing(building.gameObject); });
+        building.removeBuilding.AddListener(delegate { onRemoveBuilding(building.gameObject); });
+        building.hasRotated.AddListener(delegate { onRotatedBuilding(building.gameObject); });
+
 
     }
-    
-    public void onIsEditing(GameObject buildingGameObject){
-        if(currentlyEditing == null){
+
+    public void onIsEditing(GameObject buildingGameObject)
+    {
+        if (currentlyEditing == null)
+        {
             Building building = buildingGameObject.GetComponent<Building>();
             currentlyEditing = building;
-            building.editing=true;
-            Camera.main.GetComponent<CameraScript>().canMove=false;
-            
-        }else{
+            building.editing = true;
+            Camera.main.GetComponent<CameraScript>().canMove = false;
+
+        }
+        else
+        {
             onCompleteEditing(currentlyEditing.gameObject);
             Building building = buildingGameObject.GetComponent<Building>();
             currentlyEditing = building;
-            building.editing=true;
-            Camera.main.GetComponent<CameraScript>().canMove=false;
+            building.editing = true;
+            Camera.main.GetComponent<CameraScript>().canMove = false;
         }
         showGrid();
-        
+
         //Debug.Log("ohnono");
     }
-    public void onCompleteEditing(GameObject buildingGameObject){
+    public void onCompleteEditing(GameObject buildingGameObject)
+    {
         Building building = buildingGameObject.GetComponent<Building>();
-        Camera.main.GetComponent<CameraScript>().canMove=true;
+        Camera.main.GetComponent<CameraScript>().canMove = true;
         currentlyEditing = null;
-        if(!grid.isOnBoard(building) || grid.isOnBuilding(building)){
-            if(building.lastGridPosition.x != -1f){
-                if(building.rotated){
+        if (!grid.isOnBoard(building) || grid.isOnBuilding(building))
+        {
+            if (building.lastGridPosition.x != -1f)
+            {
+                if (building.rotated)
+                {
                     building.OnRotation();
-                    building.rotated=false;
+                    building.rotated = false;
                 }
                 building.gridPosition = building.lastGridPosition;
                 grid.changePositionOfBuilding(building.gameObject);
                 currentlyEditing = null;
-                Camera.main.GetComponent<CameraScript>().canMove=true;
+                Camera.main.GetComponent<CameraScript>().canMove = true;
                 building.hideEditButtons();
-                building.editing=false;
-                
-            }else{
-                
-                Camera.main.GetComponent<CameraScript>().canMove=true;
+                building.editing = false;
+
+            }
+            else
+            {
+
+                Camera.main.GetComponent<CameraScript>().canMove = true;
                 currentlyEditing = null;
                 Destroy(buildingGameObject);
-                inventory.addItem(buildingGameObject.name.Replace("(Clone)",""));
+                inventory.addItem(buildingGameObject.name.Replace("(Clone)", ""));
                 inventoryUI.refreshUI();
                 grid.removeBuilding(building);
             }
-            
-        }else{
-            
+
+        }
+        else
+        {
+
             building.lastGridPosition = building.gridPosition;
             grid.changePositionOfBuilding(building.gameObject);
             currentlyEditing = null;
-            Camera.main.GetComponent<CameraScript>().canMove=true;
+            Camera.main.GetComponent<CameraScript>().canMove = true;
             building.hideEditButtons();
-            building.editing=false;
+            building.editing = false;
         }
-        if(!centerPanel.inventoryUp){
+        if (!centerPanel.inventoryUp)
+        {
             hideGrid();
         }
-        
+
     }
-    public void onStopEditing(GameObject buildingGameObject){
+    public void onStopEditing(GameObject buildingGameObject)
+    {
         Building building = buildingGameObject.GetComponent<Building>();
-        if(building.lastGridPosition.x == -1f){
-            Camera.main.GetComponent<CameraScript>().canMove=true;
+        if (building.lastGridPosition.x == -1f)
+        {
+            Camera.main.GetComponent<CameraScript>().canMove = true;
             currentlyEditing = null;
             Destroy(buildingGameObject);
-            inventory.addItem(buildingGameObject.name.Replace("(Clone)",""));
+            inventory.addItem(buildingGameObject.name.Replace("(Clone)", ""));
             inventoryUI.refreshUI();
             grid.removeBuilding(building);
-        }else{
-            if(building.rotated){
+        }
+        else
+        {
+            if (building.rotated)
+            {
                 building.OnRotation();
-                building.rotated=false;
+                building.rotated = false;
             }
             building.gridPosition = building.lastGridPosition;
             grid.changePositionOfBuilding(building.gameObject);
             currentlyEditing = null;
-            Camera.main.GetComponent<CameraScript>().canMove=true;
+            Camera.main.GetComponent<CameraScript>().canMove = true;
         }
-        if(!centerPanel.inventoryUp){
+        if (!centerPanel.inventoryUp)
+        {
             hideGrid();
         }
-        
-        
 
-        
+
+
+
     }
-    
-    public void OnBuildingMouseDown(Building building){
+
+    public void OnBuildingMouseDown(Building building)
+    {
         //Debug.Log(building.gameObject.name);
-        if(currentlySelected == null){
+        if (currentlySelected == null)
+        {
             currentlySelected = building;
             building.startSelected();
-        }else{
+        }
+        else
+        {
             currentlySelected.stopSelected();
             currentlySelected = building;
             building.startSelected();
         }
     }
-    public void onRemoveBuilding(GameObject buildingGameObject){
-        Camera.main.GetComponent<CameraScript>().canMove=true;
+    public void onRemoveBuilding(GameObject buildingGameObject)
+    {
+        Camera.main.GetComponent<CameraScript>().canMove = true;
         currentlyEditing = null;
         Destroy(buildingGameObject);
-        inventory.addItem(buildingGameObject.name.Replace("(Clone)",""));
+        inventory.addItem(buildingGameObject.name.Replace("(Clone)", ""));
         inventoryUI.refreshUI();
         grid.removeBuilding(buildingGameObject.GetComponent<Building>());
-        if(!centerPanel.inventoryUp){
+        if (!centerPanel.inventoryUp)
+        {
             hideGrid();
         }
     }
-    public void onRotatedBuilding(GameObject buildingGameObject){
+    public void onRotatedBuilding(GameObject buildingGameObject)
+    {
         grid.changePositionOfBuilding(buildingGameObject);
     }
-    public void showGrid(){
-        editing=true;
-        gridParent.localScale = new Vector3(1,1,1);
+    public void showGrid()
+    {
+        editing = true;
+        gridParent.localScale = new Vector3(1, 1, 1);
     }
-    public void hideGrid(){
-        editing=false;
-        gridParent.localScale = new Vector3(0,0,0);
+    public void hideGrid()
+    {
+        editing = false;
+        gridParent.localScale = new Vector3(0, 0, 0);
     }
 }

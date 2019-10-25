@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
+
 public class LoadingManager : MonoBehaviour
 {
     private NetworkManager networkManager;
@@ -17,6 +18,7 @@ public class LoadingManager : MonoBehaviour
         networkManager.onServerFailedToConnect.AddListener(handleOnServerFailedToConnect);
 
         networkManager.Connect(host, port);
+
     }
 
     // Update is called once per frame
@@ -29,6 +31,9 @@ public class LoadingManager : MonoBehaviour
     {
         Debug.Log("connected");
         UnityMainThreadDispatcher.Instance().Enqueue(loadNextScene());
+        // RequestBase requestBase = new RequestBase();
+        // requestBase.username = "Kassa";
+        // networkManager.sendMessage(requestBase.Serialize());
 
     }
     void handleOnServerFailedToConnect()

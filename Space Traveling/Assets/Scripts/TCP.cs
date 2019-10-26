@@ -43,7 +43,7 @@ public class TCP
             NetworkStream stream = client.GetStream();
             while (client.Available >= 1)
             {
-                Byte[] data = new Byte[256];
+                Byte[] data = new Byte[2048];
 
                 // Read the first batch of the TcpServer response bytes.
                 Int32 bytes = stream.Read(data, 0, data.Length);

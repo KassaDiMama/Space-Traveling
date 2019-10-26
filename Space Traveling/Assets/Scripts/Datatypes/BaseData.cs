@@ -10,6 +10,7 @@ class BaseData
     {
         this.width = (int)grid.width;
         this.length = (int)grid.length;
+
         List<BuildingData> serializedBuildings = new List<BuildingData>();
         foreach (Building building in buildings)
         {

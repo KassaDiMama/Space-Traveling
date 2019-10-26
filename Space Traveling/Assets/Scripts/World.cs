@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 using TMPro;
 
@@ -18,6 +19,7 @@ public class IsometricTile
     public Vector2 position;
     public GameObject building;
     public GameObject gridPicture;
+
 
     public IsometricTile(int x, int y, Vector2 position)
     {
@@ -36,6 +38,7 @@ public class IsometricGrid
     public int length;
     private List<Building> buildings = new List<Building>();
     public BuildingPlaced buildingPlaced = new BuildingPlaced();
+    public JToken buildingsJson;
 
     public IsometricGrid(int width, int length, float tileWidth)
     {
@@ -107,6 +110,17 @@ public class IsometricGrid
                 GameObject clone = GameObject.Instantiate(textMesh, new Vector3(currentTile.position.x, currentTile.position.y, 0), Quaternion.identity);
                 currentTile.gridPicture = clone;
                 clone.transform.SetParent(parent);
+            }
+        }
+        if (buildingsJson != null)
+        {
+            foreach (var jsonBuilding in buildingsJson)
+            {
+                GameObject buildingGameObject = (GameObject)Resources.Load("Prefabs/" + jsonBuilding["type"].Value<string>());
+                int x = jsonBuilding["x"].Value<int>();
+                int y = jsonBuilding["y"].Value<int>();
+                Vector3 buildingGridPosition = new Vector3(x, y, 0);
+                placeBuilding(buildingGameObject, buildingGridPosition);
             }
         }
     }
@@ -223,6 +237,19 @@ public class IsometricGrid
         // dict["buildings"] = serializedBuildings;
         BaseData bd = new BaseData(this, buildings);
         return JsonConvert.SerializeObject(bd);
+    }
+    public static IsometricGrid Deserialize(string jsonString)
+    {
+        JObject json = JObject.Parse(jsonString);
+        GameObject gridSprite = (GameObject)Resources.Load("Prefabs/Grid");
+        float width = gridSprite.GetComponent<Renderer>().bounds.size.x;
+        float widthWithEdgesMerged = width * 0.95f;
+        IsometricGrid newGrid = new IsometricGrid(json["width"].Value<int>(), json["length"].Value<int>(), widthWithEdgesMerged);
+        newGrid.buildingsJson = json["buildings"];
+
+
+        Debug.Log(newGrid);
+        return newGrid;
     }
     /*
     public void placeBuilding(GameObject buildingGameObject){

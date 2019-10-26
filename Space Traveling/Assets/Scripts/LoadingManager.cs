@@ -30,10 +30,11 @@ public class LoadingManager : MonoBehaviour
     void handleOnServerConnect()
     {
         Debug.Log("connected");
-        UnityMainThreadDispatcher.Instance().Enqueue(loadNextScene());
-        // RequestBase requestBase = new RequestBase();
-        // requestBase.username = "Kassa";
-        // networkManager.sendMessage(requestBase.Serialize());
+        RequestBaseMessage requestBase = new RequestBaseMessage();
+        requestBase.username = "Kassa";
+        networkManager.sendMessage(requestBase.Serialize());
+
+
 
     }
     void handleOnServerFailedToConnect()
@@ -41,9 +42,5 @@ public class LoadingManager : MonoBehaviour
         //SceneManager.LoadScene("GameMap");
         Debug.Log("connected");
     }
-    IEnumerator loadNextScene()
-    {
-        yield return new WaitForSeconds(0.1f);
-        SceneManager.LoadScene("GameMap");
-    }
+
 }

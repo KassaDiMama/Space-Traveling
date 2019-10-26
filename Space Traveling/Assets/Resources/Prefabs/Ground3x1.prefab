@@ -136,6 +136,7 @@ MonoBehaviour:
   outlines: {fileID: 1460241803529474468}
   lastGridPosition: {x: -1, y: -1, z: -1}
   rotated: 0
+  type: Ground3x1
 --- !u!60 &8810075897138085350
 PolygonCollider2D:
   m_ObjectHideFlags: 0

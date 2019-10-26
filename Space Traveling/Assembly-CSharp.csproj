@@ -74,10 +74,13 @@
      <Compile Include="Assets\Scripts\InventoryUI.cs" />
      <Compile Include="Assets\Scripts\LoadingManager.cs" />
      <Compile Include="Assets\Scripts\Main.cs" />
-     <Compile Include="Assets\Scripts\Message Objects\BaseInformation.cs" />
+     <Compile Include="Assets\Scripts\Message Objects\BaseInformationMessage.cs" />
+     <Compile Include="Assets\Scripts\Message Objects\ChangeBuildingPositionMessage.cs" />
+     <Compile Include="Assets\Scripts\Message Objects\InventoryInformationMessage.cs" />
      <Compile Include="Assets\Scripts\Message Objects\Message.cs" />
      <Compile Include="Assets\Scripts\Message Objects\PostBase.cs" />
-     <Compile Include="Assets\Scripts\Message Objects\RequestBase.cs" />
+     <Compile Include="Assets\Scripts\Message Objects\RequestBaseMessage.cs" />
+     <Compile Include="Assets\Scripts\Message Objects\RequestInventoryMessage.cs" />
      <Compile Include="Assets\Scripts\NetworkManager.cs" />
      <Compile Include="Assets\Scripts\TCP.cs" />
      <Compile Include="Assets\Scripts\UnityMainThreadDispatcher.cs" />

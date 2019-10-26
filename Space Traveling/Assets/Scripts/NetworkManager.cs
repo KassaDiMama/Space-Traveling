@@ -66,6 +66,7 @@ public class NetworkManager : MonoBehaviour
     private void onMessageReceived(string message)
     {
         var messageObject = Message.Deserialize(message);
+        messageObject.networkManager = this;
         messageObject.onReceive();
     }
 }

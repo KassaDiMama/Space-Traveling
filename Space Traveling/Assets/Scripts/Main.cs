@@ -5,7 +5,7 @@ using UnityEngine;
 public class Main : MonoBehaviour
 {
     // Start is called before the first frame update
-    public Inventory inventory = new Inventory();
+    public Inventory inventory;
     public IsometricGrid grid;
     public Building currentlyEditing;
     public Building currentlySelected;
@@ -16,11 +16,13 @@ public class Main : MonoBehaviour
     private NetworkManager networkManager;
     void Start()
     {
+        inventory = Inventory.Deserialize(PlayerPrefs.GetString("inventoryData"));
+        Debug.Log(inventory);
         networkManager = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
         GameObject gridSprite = (GameObject)Resources.Load("Prefabs/Grid");
         float width = gridSprite.GetComponent<Renderer>().bounds.size.x;
         float widthWithEdgesMerged = width * 0.95f;
-        grid = new IsometricGrid(20, 10, widthWithEdgesMerged);
+        grid = IsometricGrid.Deserialize(PlayerPrefs.GetString("baseData"));
         grid.buildingPlaced.AddListener(OnBuildingPlaced);
         grid.placeGrid(gridParent);
         if (!centerPanel.inventoryUp)
@@ -29,11 +31,15 @@ public class Main : MonoBehaviour
         }
 
 
-        grid.placeBuilding((GameObject)Resources.Load("Prefabs/Ground3x2"), new Vector3(0, 3, 0));
-        BaseInformation baseInformation = new BaseInformation();
+        //grid.placeBuilding((GameObject)Resources.Load("Prefabs/Ground3x2"), new Vector3(3, 3, 0));
+        //grid.placeBuilding((GameObject)Resources.Load("Prefabs/Ground3x2"), new Vector3(4, 0, 0));
+        BaseInformationMessage baseInformation = new BaseInformationMessage();
         baseInformation.baseData = grid.Serialize();
-        networkManager.sendMessage(baseInformation.Serialize());
+        // networkManager.sendMessage(baseInformation.Serialize());
         //grid.placeBuilding((GameObject)Resources.Load("Prefabs/Ground3x2"));
+        // inventory.addItem("Ground3x1", 10);
+        // Debug.Log(inventory.Serialize());
+        inventoryUI.refreshUI();
     }
 
     // Update is called once per frame
@@ -123,8 +129,18 @@ public class Main : MonoBehaviour
         }
         else
         {
-
+            ChangeBuildingPositionMessage msg = new ChangeBuildingPositionMessage();
+            msg.fromX = (int)building.lastGridPosition.x;
+            msg.fromY = (int)building.lastGridPosition.y;
+            msg.toX = (int)building.gridPosition.x;
+            msg.toY = (int)building.gridPosition.y;
+            msg.toWidth = (int)building.width;
+            msg.toHeight = (int)building.height;
+            msg.username = "Kassa";
+            msg.buildingType = building.type;
+            networkManager.sendMessage(msg.Serialize());
             building.lastGridPosition = building.gridPosition;
+
             grid.changePositionOfBuilding(building.gameObject);
             currentlyEditing = null;
             Camera.main.GetComponent<CameraScript>().canMove = true;

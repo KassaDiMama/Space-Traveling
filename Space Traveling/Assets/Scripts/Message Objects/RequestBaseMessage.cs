@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-class RequestBase : Message
+class RequestBaseMessage : Message
 {
     public string username;
 }

@@ -14,6 +14,6 @@ class BuildingData
         this.y = (int)building.gridPosition.y;
         this.width = (int)building.width;
         this.height = (int)building.height;
-        this.type = "Building";
+        this.type = building.type;
     }
 }

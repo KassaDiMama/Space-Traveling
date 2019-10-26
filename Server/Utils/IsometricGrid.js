@@ -2,6 +2,8 @@ const IsometricTile = require("./IsometricTile");
 const Building = require("./Building");
 class IsometricGrid {
     constructor(width, length) {
+        this.width = width;
+        this.length = length;
         this.grid = [];
         this.buildings = [];
         for (let x = 0; x < width; x++) {
@@ -10,7 +12,6 @@ class IsometricGrid {
                 row.push(new IsometricTile(x, y));
 
             }
-            console.log(row);
             this.grid.push(row);
 
         }
@@ -29,7 +30,7 @@ class IsometricGrid {
     isOnBuilding(building) {
         for (let x = building.x; x < building.x + building.width; x++) {
             for (let y = building.y; y < building.y + building.height; y++) {
-                if (this.grid[x][y].building != null && grid[x][y].building != building) {
+                if (this.grid[x][y].building != null && this.grid[x][y].building != building) {
                     return true;
                 }
             }
@@ -37,29 +38,32 @@ class IsometricGrid {
         return false;
     }
     placeBuilding(building) {
-        this.buildings.push(building);
-        building.grid = this;
-        this.updatePosition(building);
+        if (this.isOnBoard(building) && !this.isOnBuilding(building)) {
+            console.log("Possible change");
+            this.buildings.push(building);
+            building.grid = this;
+            this.updatePosition(building);
+        } else {
+            console.log("Nah man this dude is hacking like crazy yo");
+        }
     }
     updatePosition(building) {
         building.usingTiles.forEach(tile => {
             tile.building = null;
         });
         building.usingTiles = [];
-        if (this.isOnBoard(building) && !this.isOnBuilding(building)) {
-            for (let x = building.x; x < building.x + building.width; x++) {
-                for (let y = building.y; y < building.y + building.height; y++) {
-                    this.grid[x][y].building = building;
-                    building.usingTiles.push(this.grid[x][y])
-                }
+        for (let x = building.x; x < building.x + building.width; x++) {
+            for (let y = building.y; y < building.y + building.height; y++) {
+                this.grid[x][y].building = building;
+                building.usingTiles.push(this.grid[x][y])
             }
-
         }
     }
     Serialize() {
         var dict = {};
         dict.width = this.width;
         dict.length = this.length;
+        dict.buildings = []
         this.buildings.forEach(building => {
             var buildingDict = {};
             buildingDict.x = building.x;
@@ -69,16 +73,17 @@ class IsometricGrid {
             buildingDict.type = building.type;
             dict.buildings.push(buildingDict);
         });
-        dict.buildings = [];
+        console.log(dict);
+        console.log(JSON.stringify(dict));
         return JSON.stringify(dict);
     }
     static Deserialize(jsonString) {
         var dict = JSON.parse(jsonString);
-        console.log(typeof dict.width === 'number')
         var newGrid = new IsometricGrid(dict.width, dict.length);
         dict.buildings.forEach(buildingDict => {
-            var buildingClass = require("./" + buildingDict.type);
+            var buildingClass = require("./Building"); //require("./" + buildingDict.type);
             var building = new buildingClass(buildingDict.x, buildingDict.y, buildingDict.width, buildingDict.height);
+            building.type = buildingDict.type;
             newGrid.placeBuilding(building);
         });
         return newGrid;

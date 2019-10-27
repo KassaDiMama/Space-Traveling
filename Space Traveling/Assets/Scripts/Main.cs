@@ -214,6 +214,9 @@ public class Main : MonoBehaviour
         {
             hideGrid();
         }
+        RemoveBuildingMessage RBM = new RemoveBuildingMessage();
+        RBM.buildingData = new BuildingData(buildingGameObject.GetComponent<Building>());
+        networkManager.sendMessage(RBM.Serialize());
     }
     public void onRotatedBuilding(GameObject buildingGameObject)
     {

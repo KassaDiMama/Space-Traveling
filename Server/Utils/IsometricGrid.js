@@ -39,7 +39,7 @@ class IsometricGrid {
     }
     placeBuilding(building) {
         if (this.isOnBoard(building) && !this.isOnBuilding(building)) {
-            console.log("Possible change");
+            //console.log("Possible change");
             this.buildings.push(building);
             building.grid = this;
             this.updatePosition(building);
@@ -59,6 +59,18 @@ class IsometricGrid {
             }
         }
     }
+    removeBuilding(building) {
+
+        building.usingTiles.forEach(tile => {
+            tile.building = null;
+        });
+        building.usingTiles = [];
+        var index = this.buildings.findIndex((b) => {
+            return ((b.x == building.x) && (b.y == building.y))
+        });
+        this.buildings.splice(index, 1);
+        //console.log(index)
+    }
     Serialize() {
         var dict = {};
         dict.width = this.width;
@@ -73,8 +85,8 @@ class IsometricGrid {
             buildingDict.type = building.type;
             dict.buildings.push(buildingDict);
         });
-        console.log(dict);
-        console.log(JSON.stringify(dict));
+        // console.log(dict);
+        // console.log(JSON.stringify(dict));
         return JSON.stringify(dict);
     }
     static Deserialize(jsonString) {

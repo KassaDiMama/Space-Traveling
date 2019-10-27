@@ -5,6 +5,7 @@ class Inventory {
     }
 
     itemPresent(name) {
+        //console.log(this.getItem(name))
         if (this.getItem(name) != null) {
             return true;
         } else {
@@ -12,12 +13,13 @@ class Inventory {
         }
     }
     getItem(name) {
+        var item = null;
         this.inventoryList.forEach(inventoryItem => {
-            if (InventoryItem.prefabName == name) {
-                return inventoryItem;
+            if (inventoryItem.prefabName == name) {
+                item = inventoryItem;
             }
         });
-        return null;
+        return item
     }
     addItem(name, amount) {
         if (this.itemPresent(name)) {
@@ -28,17 +30,17 @@ class Inventory {
         }
     }
     removeItem(name, amount = 1) {
-        item = getItem(name)
+        var item = this.getItem(name)
         item.amount -= amount;
         if (item.amount <= 0) {
-            this.inventoryList.slice(this.inventoryList.indexOf(item));
+            this.inventoryList.splice(this.inventoryList.indexOf(item), 1);
         }
     }
     Serialize() {
         return JSON.stringify(this);
     }
     static Deserialize(jsonString) {
-        var newInv = new InventoryItem();
+        var newInv = new Inventory();
         newInv.inventoryList = JSON.parse(jsonString).inventoryList;
         return newInv;
     }

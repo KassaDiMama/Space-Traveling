@@ -2,6 +2,7 @@ const net = require('net');
 const port = 33333;
 const host = '0.0.0.0';
 const messages = require("./Messages");
+const DatabaseQueue = require("./Utils/DatabaseQueu");
 
 const server = net.createServer();
 server.listen(port, host, () => {
@@ -13,6 +14,7 @@ let users = [];
 server.on('connection', function (sock) {
     console.log('CONNECTED: ' + sock.remoteAddress + ':' + sock.remotePort);
     users.push(sock);
+    sock.databaseQueu = new DatabaseQueue();
 
     sock.on('data', function (data) {
         //console.log('DATA ' + sock.remoteAddress + ': ' + data);

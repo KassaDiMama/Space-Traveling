@@ -21,20 +21,25 @@ class Inventory {
         });
         return item
     }
-    addItem(name, amount) {
+    addItem(name, amount, type) {
         if (this.itemPresent(name)) {
             this.getItem(name).amount += amount;
         } else {
-            var newItem = new InventoryItem(name, amount);
+            var newItem = new InventoryItem(name, amount, type);
             this.inventoryList.push(newItem);
         }
     }
     removeItem(name, amount = 1) {
         var item = this.getItem(name)
-        item.amount -= amount;
-        if (item.amount <= 0) {
-            this.inventoryList.splice(this.inventoryList.indexOf(item), 1);
+        if (item) {
+            item.amount -= amount;
+            if (item.amount <= 0) {
+                this.inventoryList.splice(this.inventoryList.indexOf(item), 1);
+            }
+        } else {
+            console.warn("No such item in inventory");
         }
+
     }
     Serialize() {
         return JSON.stringify(this);

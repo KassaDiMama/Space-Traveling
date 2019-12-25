@@ -4,6 +4,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 class RequestInventoryMessage : Message
 {
-    public string username = "Kassa";
+
 
 }

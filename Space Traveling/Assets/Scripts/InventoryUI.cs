@@ -11,10 +11,13 @@ using TMPro;
 public class InventoryUI : MonoBehaviour
 {
     // Start is called before the first frame update
-    public GameObject sample;
+    public GameObject buildingSample;
+    public GameObject rocketSample;
     public Main main;
-    public RectTransform content;
-    public RectTransform contentViewPort;
+    public RectTransform buildingContent;
+    public RectTransform buildingContentViewPort;
+    public RectTransform rocketContent;
+    public RectTransform rocketContentViewPort;
 
     void Start()
     {
@@ -29,32 +32,58 @@ public class InventoryUI : MonoBehaviour
     public void refreshUI()
     {
 
-        foreach (Transform child in content)
+        foreach (Transform child in buildingContent)
+        {
+            Destroy(child.gameObject);
+        }
+        foreach (Transform child in rocketContent)
         {
             Destroy(child.gameObject);
         }
         foreach (InventoryItem item in main.inventory.inventoryList)
         {
+            if (item.type == "Building")
+            {
+                GameObject itemPrefab = (GameObject)Resources.Load("Prefabs/" + item.prefabName);
+                GameObject newItem = GameObject.Instantiate(buildingSample);
+                //Debug.Log(itemPrefab);
 
-            GameObject itemPrefab = (GameObject)Resources.Load("Prefabs/" + item.prefabName);
-            GameObject newItem = GameObject.Instantiate(sample);
-            //Debug.Log(itemPrefab);
+
+                //newItem.GetComponent<EventTrigger>().triggers.PointerDown.AddListener(delegate{itemDown(newItem);});
+                //newItem.GetComponent<EventTrigger>().PointerUp.AddListener(delegate{itemUp(newItem);});
+
+                newItem.transform.SetParent(buildingContent, false);
+                newItem.transform.localScale = Vector3.one;
+                newItem.GetComponent<InventoryItemUI>().contentTransform = buildingContent;
+                newItem.GetComponent<InventoryItemUI>().inventoryTransform = gameObject.GetComponent<RectTransform>();
+                newItem.GetComponent<InventoryItemUI>().placedOnGrid.AddListener(delegate { onPlaceOnGrid(item, newItem); });
+
+                newItem.GetComponent<InventoryItemUI>().prefabName = item.prefabName;
+                newItem.transform.Find("Amount").gameObject.GetComponent<TMP_Text>().text = item.amount.ToString();
+
+                //LayoutRebuilder.ForceRebuildLayoutImmediate(buildingContent);
+                newItem.transform.Find("Image").GetComponent<Image>().sprite = itemPrefab.GetComponent<Building>().buildingRenderer.sprite;
+
+            }
+            else if (item.type == "Rocket")
+            {
+                GameObject itemPrefab = (GameObject)Resources.Load("Prefabs/" + item.prefabName);
+                GameObject newItem = GameObject.Instantiate(rocketSample);
+                RocketItemUI rocketItemUI = newItem.GetComponent<RocketItemUI>();
+                rocketItemUI.prefabName = item.prefabName;
+                rocketItemUI.main = main;
+
+                //Debug.Log(itemPrefab);
 
 
-            //newItem.GetComponent<EventTrigger>().triggers.PointerDown.AddListener(delegate{itemDown(newItem);});
-            //newItem.GetComponent<EventTrigger>().PointerUp.AddListener(delegate{itemUp(newItem);});
+                //newItem.GetComponent<EventTrigger>().triggers.PointerDown.AddListener(delegate{itemDown(newItem);});
+                //newItem.GetComponent<EventTrigger>().PointerUp.AddListener(delegate{itemUp(newItem);});
+                newItem.transform.SetParent(rocketContent, false);
+                newItem.transform.localScale = Vector3.one;
+                //LayoutRebuilder.ForceRebuildLayoutImmediate(buildingContent);
+                newItem.transform.Find("Image").GetComponent<Image>().sprite = itemPrefab.GetComponent<Rocket>().GetComponent<SpriteRenderer>().sprite;
 
-            newItem.transform.SetParent(content, false);
-            newItem.transform.localScale = Vector3.one;
-            newItem.GetComponent<InventoryItemUI>().contentTransform = content;
-            newItem.GetComponent<InventoryItemUI>().inventoryTransform = gameObject.GetComponent<RectTransform>();
-            newItem.GetComponent<InventoryItemUI>().placedOnGrid.AddListener(delegate { onPlaceOnGrid(item, newItem); });
-
-            newItem.GetComponent<InventoryItemUI>().prefabName = item.prefabName;
-            newItem.transform.Find("Amount").gameObject.GetComponent<TMP_Text>().text = item.amount.ToString();
-
-            //LayoutRebuilder.ForceRebuildLayoutImmediate(content);
-            newItem.transform.Find("Image").GetComponent<Image>().sprite = itemPrefab.GetComponent<Building>().buildingRenderer.sprite;
+            }
         }
     }
 
@@ -72,6 +101,14 @@ public class InventoryUI : MonoBehaviour
         main.inventory.removeItem(itemGameObject.name.Replace("(Clone)", ""));
         Destroy(itemUI);
         refreshUI();
+    }
+    public void show()
+    {
+        GetComponent<CanvasGroup>().alpha = 1f;
+    }
+    public void hide()
+    {
+        GetComponent<CanvasGroup>().alpha = 0f;
     }
     /*
     public void onIsEditing(GameObject buildingGameObject){

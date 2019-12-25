@@ -117,14 +117,48 @@ public class IsometricGrid
             foreach (var jsonBuilding in buildingsJson)
             {
                 GameObject buildingGameObject = (GameObject)Resources.Load("Prefabs/" + jsonBuilding["type"].Value<string>());
+                //buildingGameObject = GameObject.Instantiate(buildingGameObject);
+                Building building = buildingGameObject.GetComponent<Building>();
                 int x = jsonBuilding["x"].Value<int>();
                 int y = jsonBuilding["y"].Value<int>();
                 Vector3 buildingGridPosition = new Vector3(x, y, 0);
-                placeBuilding(buildingGameObject, buildingGridPosition);
+                int width = jsonBuilding["width"].Value<int>();
+                int height = jsonBuilding["height"].Value<int>();
+                if (width != building.width && height != building.height)
+                {
+                    building.rotated = true;
+                    //building.rotated = false;
+                }
+                Rocket rocket = null;
+                if (jsonBuilding["rocket"] != null)
+                {
+                    GameObject rocketInstance = GameObject.Instantiate((GameObject)Resources.Load("Prefabs/" + jsonBuilding["rocket"]["type"].Value<string>()));
+                    rocket = rocketInstance.GetComponent<Rocket>();
+                }
+
+                placeBuilding(buildingGameObject, buildingGridPosition, rocket);
             }
         }
     }
-    public GameObject placeBuilding(GameObject buildingGameObject, Vector3 gridPosition)
+    public List<RocketHolder> getAllEmptyRocketHolders()
+    {
+        List<RocketHolder> rocketHolderList = new List<RocketHolder>();
+        foreach (Building building in buildings)
+        {
+            GameObject buildingGameObject = building.gameObject;
+            RocketHolder rocketHolder = buildingGameObject.GetComponent<RocketHolder>();
+            if (rocketHolder)
+            {
+                if (rocketHolder.rocket == null)
+                {
+                    rocketHolderList.Add(rocketHolder);
+                }
+            }
+        }
+        return rocketHolderList;
+    }
+
+    public GameObject placeBuilding(GameObject buildingGameObject, Vector3 gridPosition, Rocket rocket = null)
     {
         /*
         Building building = buildingGameObject.GetComponent<Building>();
@@ -137,6 +171,12 @@ public class IsometricGrid
 
         GameObject buildingInstance = GameObject.Instantiate(buildingGameObject);
         Building building = buildingInstance.GetComponent<Building>();
+        Debug.Log(buildingGameObject.transform.Find("EditButtons").lossyScale);
+        if (building.rotated)
+        {
+            building.OnRotation();
+        }
+        buildingGameObject.GetComponent<Building>().rotated = false;
         building.grid = this;
         building.gridPosition = gridPosition;
 
@@ -149,6 +189,13 @@ public class IsometricGrid
             buildings.Add(building);
         }
         buildingPlaced.Invoke(buildingInstance.GetComponent<Building>());
+        if (rocket != null)
+        {
+            RocketHolder rocketHolder = buildingInstance.GetComponent<RocketHolder>();
+            rocketHolder.Start();
+            rocketHolder.addRocket(rocket);
+
+        }
         return buildingInstance;
     }
     public void changePositionOfBuilding(GameObject buildingGameObject)
@@ -195,6 +242,10 @@ public class IsometricGrid
         else
         {
             building.buildingRenderer.color = Color.white;
+        }
+        if (buildingGameObject.GetComponent<RocketHolder>())
+        {
+            buildingGameObject.GetComponent<RocketHolder>().updateRocketPosition();
         }
         //}
     }

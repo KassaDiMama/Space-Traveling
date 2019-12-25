@@ -7,38 +7,104 @@ using DG.Tweening;
 public class CenterPanel : MonoBehaviour
 {
     public Button inventoryButton;
+    public Button rocketsButton;
     public Button friendsButton;
-    public RectTransform inventoryPanel;
+    public InventoryUI inventoryPanel;
+    public RocketsUI rocketsPanel;
     public Main main;
-    public bool inventoryUp=false;
+    public bool rocketsPanelUp = false;
+    public bool inventoryPanelUp = false;
     // Start is called before the first frame update
     void Start()
     {
         inventoryButton.onClick.AddListener(OnInventoryButtonClicked);
+        rocketsButton.onClick.AddListener(OnRocketsButtonClicked);
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
-    void OnInventoryButtonClicked(){
-        if(main.editing){
+    void OnInventoryButtonClicked()
+    {
+        inventoryPanel.refreshUI();
+        if (main.editing && inventoryPanelUp)
+        {
             moveInventoryDown();
-        }else{
-            moveInventoryUp();
+            //moveInventoryDown();
+        }
+        else
+        {
+            moveinventoryPanelUp();
         }
     }
-    public void moveInventoryDown(){
-        if(main.currentlyEditing==null){
+    void OnRocketsButtonClicked()
+    {
+        inventoryPanel.refreshUI();
+        if (rocketsPanelUp)
+        {
+            moveRocketsDown();
+            inventoryPanel.hide();
+            rocketsPanel.show();
+        }
+        else
+        {
+            moveRocketsUp();
+            inventoryPanel.hide();
+            rocketsPanel.show();
+        }
+    }
+    private void MoveCenterPanelDown()
+    {
+        GetComponent<RectTransform>().DOAnchorPos(new Vector2(0, -56), 0.25f);
+        if (main.currentlyEditing == null)
+        {
             main.hideGrid();
         }
-        inventoryUp = false;
-        GetComponent<RectTransform>().DOAnchorPos(new Vector2(0,-56),0.25f);
+        inventoryPanelUp = false;
+        rocketsPanelUp = false;
     }
-    public void moveInventoryUp(){
+    private void MoveCenterPanelUp()
+    {
+        GetComponent<RectTransform>().DOAnchorPos(new Vector2(0, 56), 0.25f);
+        inventoryPanelUp = true;
+        rocketsPanelUp = true;
+    }
+    public void moveInventoryDown()
+    {
+        if (main.currentlyEditing == null)
+        {
+            main.hideGrid();
+        }
+        inventoryPanelUp = false;
+        rocketsPanelUp = false;
+        GetComponent<RectTransform>().DOAnchorPos(new Vector2(0, -56), 0.25f);
+    }
+    public void moveinventoryPanelUp()
+    {
         main.showGrid();
-        inventoryUp = true;
-        GetComponent<RectTransform>().DOAnchorPos(new Vector2(0,56),0.25f);
+        inventoryPanelUp = true;
+        rocketsPanelUp = false;
+        GetComponent<RectTransform>().DOAnchorPos(new Vector2(0, 56), 0.25f);
+        inventoryPanel.show();
+        rocketsPanel.hide();
+    }
+
+    public void moveRocketsDown()
+    {
+
+        rocketsPanelUp = false;
+        GetComponent<RectTransform>().DOAnchorPos(new Vector2(0, -56), 0.25f);
+
+    }
+    public void moveRocketsUp()
+    {
+        main.hideGrid();
+        rocketsPanelUp = true;
+        inventoryPanelUp = false;
+        GetComponent<RectTransform>().DOAnchorPos(new Vector2(0, 56), 0.25f);
+        inventoryPanel.hide();
+        rocketsPanel.show();
     }
 }

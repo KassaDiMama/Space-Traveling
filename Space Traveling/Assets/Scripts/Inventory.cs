@@ -8,11 +8,13 @@ public class InventoryItem
 {
     public string prefabName;
     public int amount;
+    public string type;
 
-    public InventoryItem(string prefabName, int amount)
+    public InventoryItem(string prefabName, int amount, string type)
     {
         this.prefabName = prefabName;
         this.amount = amount;
+        this.type = type;
     }
 }
 
@@ -47,7 +49,7 @@ public class Inventory
         }
         return null;
     }
-    public void addItem(string name, int amount = 1)
+    public void addItem(string name, string type, int amount = 1)
     {
         if (itemPresent(name))
         {
@@ -55,7 +57,7 @@ public class Inventory
         }
         else
         {
-            InventoryItem newItem = new InventoryItem(name, amount);
+            InventoryItem newItem = new InventoryItem(name, amount, type);
             inventoryList.Add(newItem);
         }
     }

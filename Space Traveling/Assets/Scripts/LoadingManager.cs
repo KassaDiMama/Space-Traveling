@@ -13,11 +13,32 @@ public class LoadingManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        networkManager = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
+        if (GameObject.Find("NetworkManager") != null)
+        {
+            networkManager = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
+        }
+        else
+        {
+            GameObject networkManagerInstance = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/NetworkManager"));
+            networkManagerInstance.name = "NetworkManager";
+            networkManager = networkManagerInstance.GetComponent<NetworkManager>();
+        }
         networkManager.onServerConnect.AddListener(handleOnServerConnect);
         networkManager.onServerFailedToConnect.AddListener(handleOnServerFailedToConnect);
+        if (networkManager.key != "")
+        {
+            Debug.Log("WHAAAAAAAAAAAAAT");
+            Debug.Log(networkManager.key);
+            RequestBaseMessage requestBase = new RequestBaseMessage();
+            //requestBase.username = "Kassa";
+            networkManager.sendMessage(requestBase);
+        }
+        else
+        {
+            Debug.Log(networkManager.key);
+            networkManager.Connect(host, port);
+        }
 
-        networkManager.Connect(host, port);
 
     }
 
@@ -30,17 +51,36 @@ public class LoadingManager : MonoBehaviour
     void handleOnServerConnect()
     {
         Debug.Log("connected");
-        RequestBaseMessage requestBase = new RequestBaseMessage();
-        requestBase.username = "Kassa";
-        networkManager.sendMessage(requestBase.Serialize());
+        UnityMainThreadDispatcher.Instance().Enqueue(connectedFunction());
 
 
+
+
+
+
+
+    }
+    IEnumerator connectedFunction()
+    {
+        yield return new WaitForSeconds(0.1f);
+        Debug.Log(PlayerPrefs.GetString("Username") == "");
+        if (PlayerPrefs.GetString("Username") != "" && PlayerPrefs.GetString("Password") != "")
+        {
+            LoginMessage loginMessage = new LoginMessage();
+            loginMessage.username = PlayerPrefs.GetString("Username");
+            loginMessage.password = PlayerPrefs.GetString("Password");
+            networkManager.sendMessage(loginMessage);
+        }
+        else
+        {
+            SceneManager.LoadScene("LoginScene");
+        }
 
     }
     void handleOnServerFailedToConnect()
     {
         //SceneManager.LoadScene("GameMap");
-        Debug.Log("connected");
+        Debug.Log("Failed to connect..");
     }
 
 }

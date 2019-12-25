@@ -25,7 +25,7 @@ public class Main : MonoBehaviour
         grid = IsometricGrid.Deserialize(PlayerPrefs.GetString("baseData"));
         grid.buildingPlaced.AddListener(OnBuildingPlaced);
         grid.placeGrid(gridParent);
-        if (!centerPanel.inventoryUp)
+        if (!centerPanel.inventoryPanelUp)
         {
             hideGrid();
         }
@@ -121,7 +121,7 @@ public class Main : MonoBehaviour
                 Camera.main.GetComponent<CameraScript>().canMove = true;
                 currentlyEditing = null;
                 Destroy(buildingGameObject);
-                inventory.addItem(buildingGameObject.name.Replace("(Clone)", ""));
+                inventory.addItem(buildingGameObject.name.Replace("(Clone)", ""), "Building");
                 inventoryUI.refreshUI();
                 grid.removeBuilding(building);
             }
@@ -136,9 +136,8 @@ public class Main : MonoBehaviour
             msg.toY = (int)building.gridPosition.y;
             msg.toWidth = (int)building.width;
             msg.toHeight = (int)building.height;
-            msg.username = "Kassa";
             msg.buildingType = building.type;
-            networkManager.sendMessage(msg.Serialize());
+            networkManager.sendMessage(msg);
             building.lastGridPosition = building.gridPosition;
 
             grid.changePositionOfBuilding(building.gameObject);
@@ -147,7 +146,7 @@ public class Main : MonoBehaviour
             building.hideEditButtons();
             building.editing = false;
         }
-        if (!centerPanel.inventoryUp)
+        if (!centerPanel.inventoryPanelUp)
         {
             hideGrid();
         }
@@ -161,7 +160,7 @@ public class Main : MonoBehaviour
             Camera.main.GetComponent<CameraScript>().canMove = true;
             currentlyEditing = null;
             Destroy(buildingGameObject);
-            inventory.addItem(buildingGameObject.name.Replace("(Clone)", ""));
+            inventory.addItem(buildingGameObject.name.Replace("(Clone)", ""), "Building");
             inventoryUI.refreshUI();
             grid.removeBuilding(building);
         }
@@ -177,7 +176,7 @@ public class Main : MonoBehaviour
             currentlyEditing = null;
             Camera.main.GetComponent<CameraScript>().canMove = true;
         }
-        if (!centerPanel.inventoryUp)
+        if (!centerPanel.inventoryPanelUp)
         {
             hideGrid();
         }
@@ -207,16 +206,16 @@ public class Main : MonoBehaviour
         Camera.main.GetComponent<CameraScript>().canMove = true;
         currentlyEditing = null;
         Destroy(buildingGameObject);
-        inventory.addItem(buildingGameObject.name.Replace("(Clone)", ""));
+        inventory.addItem(buildingGameObject.name.Replace("(Clone)", ""), "Building");
         inventoryUI.refreshUI();
         grid.removeBuilding(buildingGameObject.GetComponent<Building>());
-        if (!centerPanel.inventoryUp)
+        if (!centerPanel.inventoryPanelUp)
         {
             hideGrid();
         }
         RemoveBuildingMessage RBM = new RemoveBuildingMessage();
         RBM.buildingData = new BuildingData(buildingGameObject.GetComponent<Building>());
-        networkManager.sendMessage(RBM.Serialize());
+        networkManager.sendMessage(RBM);
     }
     public void onRotatedBuilding(GameObject buildingGameObject)
     {
@@ -231,5 +230,21 @@ public class Main : MonoBehaviour
     {
         editing = false;
         gridParent.localScale = new Vector3(0, 0, 0);
+    }
+    public void placeRocket(string prefabName)
+    {
+        List<RocketHolder> rocketHolderList = grid.getAllEmptyRocketHolders();
+        if (rocketHolderList.Count > 0)
+        {
+            Rocket rocket = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/" + prefabName)).GetComponent<Rocket>();
+            RocketHolder rocketHolder = rocketHolderList[0];
+            rocketHolder.addRocket(rocket);
+            AddRocketOnBuildingMessage message = new AddRocketOnBuildingMessage();
+            message.buildingX = (int)rocketHolder.building.lastGridPosition.x;
+            message.buildingY = (int)rocketHolder.building.lastGridPosition.y;
+            message.type = rocket.type;
+            networkManager.sendMessage(message.Serialize());
+            inventory.removeItem(rocket.type);
+        }
     }
 }

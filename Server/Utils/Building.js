@@ -7,6 +7,14 @@ class Building {
         this.height = height;
         this.grid = null;
         this.usingTiles = [];
+        this.rocket = null;
+    }
+    placeRocket(rocket) {
+        if (this.rocket == null) {
+            this.rocket = rocket;
+        } else {
+            console.warn("Can't place rocket here.")
+        }
     }
 }
 

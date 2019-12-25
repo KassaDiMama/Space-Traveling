@@ -10,6 +10,7 @@ public class NetworkManager : MonoBehaviour
     private TCP tcp = new TCP();
     public UnityEvent onServerConnect = new UnityEvent();
     public UnityEvent onServerFailedToConnect = new UnityEvent();
+    public string key = null;
     //public UnityMainThreadDispatcher UMTD;
     // Start is called before the first frame update
     void Start()
@@ -59,9 +60,12 @@ public class NetworkManager : MonoBehaviour
         Debug.Log("Ping");
     }
 
-    public void sendMessage(string message)
+    public void sendMessage(dynamic message)
     {
-        tcp.sendMessage(message);
+        message.key = this.key;
+
+        //Debug.Log(message.Serialize());
+        tcp.sendMessage(message.Serialize());
     }
     private void onMessageReceived(string message)
     {

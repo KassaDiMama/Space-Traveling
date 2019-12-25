@@ -156,7 +156,8 @@ public class Building : MonoBehaviour
     }
     public void showEditButtons()
     {
-        transform.Find("EditButtons").localScale = new Vector3(0.1f, 0.1f, 0.1f);
+        int editButtonDir = (int)(Mathf.Abs(transform.localScale.x) / transform.localScale.x);
+        transform.Find("EditButtons").localScale = new Vector3(editButtonDir * 0.1f, 0.1f, 0.1f);
     }
     public void hideEditButtons()
     {
@@ -166,10 +167,28 @@ public class Building : MonoBehaviour
     public void startSelected()
     {
         outlines.localScale = new Vector3(1f, 1f, 1f);
+        if (transform.Find("SelectedMenu"))
+        {
+            SelectedMenu selectedMenu = transform.Find("SelectedMenu").GetComponent<SelectedMenu>();
+            if (selectedMenu)
+            {
+                int menuDir = (int)(Mathf.Abs(transform.localScale.x) / transform.localScale.x);
+                selectedMenu.show(menuDir);
+            }
+        }
+
     }
     public void stopSelected()
     {
         outlines.localScale = new Vector3(0f, 0f, 0f);
+        if (transform.Find("SelectedMenu"))
+        {
+            SelectedMenu selectedMenu = transform.Find("SelectedMenu").GetComponent<SelectedMenu>();
+            if (selectedMenu)
+            {
+                selectedMenu.hide();
+            }
+        }
     }
 
 }

@@ -8,6 +8,7 @@ class Message
 {
     public string command = "Message";
     public NetworkManager networkManager;
+    public string key;
     public Message()
     {
         command = this.GetType().Name;
@@ -15,7 +16,11 @@ class Message
 
     public string Serialize()
     {
-        return JsonConvert.SerializeObject(this);
+        return JsonConvert.SerializeObject(this, Formatting.Indented, new JsonSerializerSettings
+        {
+            NullValueHandling = NullValueHandling.Ignore
+        });
+        //return JsonConvert.SerializeObject(this);
     }
     public static dynamic Deserialize(string jsonString)
     {

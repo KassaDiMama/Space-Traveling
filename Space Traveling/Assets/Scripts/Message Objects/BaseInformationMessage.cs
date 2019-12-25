@@ -10,6 +10,6 @@ class BaseInformationMessage : Message
     {
         PlayerPrefs.SetString("baseData", baseData);
         RequestInventoryMessage inventoryMessage = new RequestInventoryMessage();
-        networkManager.sendMessage(inventoryMessage.Serialize());
+        networkManager.sendMessage(inventoryMessage);
     }
 }

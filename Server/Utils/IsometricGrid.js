@@ -59,6 +59,7 @@ class IsometricGrid {
             }
         }
     }
+
     removeBuilding(building) {
 
         building.usingTiles.forEach(tile => {
@@ -83,6 +84,9 @@ class IsometricGrid {
             buildingDict.width = building.width;
             buildingDict.height = building.height;
             buildingDict.type = building.type;
+            if (building.rocket != null) {
+                buildingDict.rocket = building.rocket;
+            }
             dict.buildings.push(buildingDict);
         });
         // console.log(dict);
@@ -95,6 +99,9 @@ class IsometricGrid {
         dict.buildings.forEach(buildingDict => {
             var buildingClass = require("./Building"); //require("./" + buildingDict.type);
             var building = new buildingClass(buildingDict.x, buildingDict.y, buildingDict.width, buildingDict.height);
+            if (buildingDict.rocket) {
+                building.rocket = buildingDict.rocket;
+            }
             building.type = buildingDict.type;
             newGrid.placeBuilding(building);
         });

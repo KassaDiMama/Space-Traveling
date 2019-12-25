@@ -1,7 +1,8 @@
 class DatabaseQueu {
-    constructor() {
+    constructor(db) {
         this.queu = [];
         this.running = false;
+        this.db = db;
     }
     addFunction(func) {
         if (this.running == false) {
@@ -13,6 +14,7 @@ class DatabaseQueu {
         } else {
             this.queu.push(func);
             console.log("queu length1: " + this.queu.length)
+            console.log(this.queu)
         }
     }
     nextQueue(self) {
@@ -22,6 +24,7 @@ class DatabaseQueu {
             self.queu.splice(0, 1);
             promise.then(self.nextQueue).catch((err) => {
                 console.error(err)
+                this.nextQueue()
             });
         } else {
             self.running = false;

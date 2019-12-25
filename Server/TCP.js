@@ -30,6 +30,8 @@ MongoClient.connect("mongodb://localhost:27017/", (err, db) => {
                 messageObject.db = sock.databaseQueu.db;
                 if (sock.key == messageObject.key || sock.key == null) {
                     messageObject.onReceive();
+                } else {
+                    console.log("Wrong key hacker!")
                 }
 
             } else {

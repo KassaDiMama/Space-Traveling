@@ -13,11 +13,13 @@ public class InventoryUI : MonoBehaviour
     // Start is called before the first frame update
     public GameObject buildingSample;
     public GameObject rocketSample;
+    public GameObject friendSample;
     public Main main;
     public RectTransform buildingContent;
     public RectTransform buildingContentViewPort;
     public RectTransform rocketContent;
     public RectTransform rocketContentViewPort;
+    public RectTransform friendsContent;
 
     void Start()
     {
@@ -31,12 +33,17 @@ public class InventoryUI : MonoBehaviour
     }
     public void refreshUI()
     {
+        FriendsList friendsList = FriendsList.Deserialize(PlayerPrefs.GetString("friendsList"));
 
         foreach (Transform child in buildingContent)
         {
             Destroy(child.gameObject);
         }
         foreach (Transform child in rocketContent)
+        {
+            Destroy(child.gameObject);
+        }
+        foreach (Transform child in friendsContent)
         {
             Destroy(child.gameObject);
         }
@@ -83,6 +90,13 @@ public class InventoryUI : MonoBehaviour
                 //LayoutRebuilder.ForceRebuildLayoutImmediate(buildingContent);
                 newItem.transform.Find("Image").GetComponent<Image>().sprite = itemPrefab.GetComponent<Rocket>().GetComponent<SpriteRenderer>().sprite;
 
+            }
+            foreach (Friend friend in friendsList.friends)
+            {
+                GameObject newFriend = GameObject.Instantiate(friendSample);
+                newFriend.transform.Find("FriendName").gameObject.GetComponent<TMP_Text>().text = friend.username;
+                newFriend.transform.SetParent(friendsContent, false);
+                newFriend.transform.localScale = Vector3.one;
             }
         }
     }

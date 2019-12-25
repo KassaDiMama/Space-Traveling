@@ -1,9 +1,13 @@
+const Friend = require("./Friend");
 class FriendsList {
     constructor() {
         this.friends = [];
     }
     addFriend(friend) {
-        this.friends.push(friend);
+        if (this.findFriend(friend.username) == null) {
+            this.friends.push(friend);
+        }
+
     }
     findFriend(username) {
         this.friends.forEach(friend => {
@@ -24,6 +28,16 @@ class FriendsList {
     }
     Serialize() {
         return JSON.stringify(this);
+    }
+    static Deserialize(jsonString) {
+        var json = JSON.parse(jsonString);
+        var friendsList = new FriendsList();
+        json.friends.forEach(friendJson => {
+            var friend = new Friend();
+            friend.username = friendJson;
+            friendsList.friends.push(friend);
+        });
+        return friendsList;
     }
 
 }

@@ -68,6 +68,8 @@
      <Compile Include="Assets\Scripts\Datatypes\BaseData.cs" />
      <Compile Include="Assets\Scripts\Datatypes\BuildingData.cs" />
      <Compile Include="Assets\Scripts\EditButtons.cs" />
+     <Compile Include="Assets\Scripts\Friend.cs" />
+     <Compile Include="Assets\Scripts\FriendsList.cs" />
      <Compile Include="Assets\Scripts\FriendsUI.cs" />
      <Compile Include="Assets\Scripts\GameObjectButton.cs" />
      <Compile Include="Assets\Scripts\Inventory.cs" />
@@ -76,6 +78,8 @@
      <Compile Include="Assets\Scripts\LoadingManager.cs" />
      <Compile Include="Assets\Scripts\LoginManager.cs" />
      <Compile Include="Assets\Scripts\Main.cs" />
+     <Compile Include="Assets\Scripts\Message Objects\AcceptFriendMessage.cs" />
+     <Compile Include="Assets\Scripts\Message Objects\AddFriendMessage.cs" />
      <Compile Include="Assets\Scripts\Message Objects\AddRocketOnBuildingMessage.cs" />
      <Compile Include="Assets\Scripts\Message Objects\BaseInformationMessage.cs" />
      <Compile Include="Assets\Scripts\Message Objects\ChangeBuildingPositionMessage.cs" />

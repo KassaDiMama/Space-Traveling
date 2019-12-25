@@ -243,7 +243,7 @@ public class Main : MonoBehaviour
             message.buildingX = (int)rocketHolder.building.lastGridPosition.x;
             message.buildingY = (int)rocketHolder.building.lastGridPosition.y;
             message.type = rocket.type;
-            networkManager.sendMessage(message.Serialize());
+            networkManager.sendMessage(message);
             inventory.removeItem(rocket.type);
         }
     }

@@ -68,6 +68,7 @@
      <Compile Include="Assets\Scripts\Datatypes\BaseData.cs" />
      <Compile Include="Assets\Scripts\Datatypes\BuildingData.cs" />
      <Compile Include="Assets\Scripts\EditButtons.cs" />
+     <Compile Include="Assets\Scripts\FriendsUI.cs" />
      <Compile Include="Assets\Scripts\GameObjectButton.cs" />
      <Compile Include="Assets\Scripts\Inventory.cs" />
      <Compile Include="Assets\Scripts\InventoryItemUI.cs" />
@@ -87,6 +88,8 @@
      <Compile Include="Assets\Scripts\Message Objects\RemoveRocketOnBuildingMessage.cs" />
      <Compile Include="Assets\Scripts\Message Objects\RequestBaseMessage.cs" />
      <Compile Include="Assets\Scripts\Message Objects\RequestInventoryMessage.cs" />
+     <Compile Include="Assets\Scripts\Message Objects\StartInformationMessage.cs" />
+     <Compile Include="Assets\Scripts\Message Objects\StartInformationRequestMessage.cs" />
      <Compile Include="Assets\Scripts\NetworkManager.cs" />
      <Compile Include="Assets\Scripts\RegisterMessage.cs" />
      <Compile Include="Assets\Scripts\Rocket.cs" />

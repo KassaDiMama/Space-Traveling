@@ -29,9 +29,10 @@ public class LoadingManager : MonoBehaviour
         {
             Debug.Log("WHAAAAAAAAAAAAAT");
             Debug.Log(networkManager.key);
-            RequestBaseMessage requestBase = new RequestBaseMessage();
+            //RequestBaseMessage requestBase = new RequestBaseMessage();
             //requestBase.username = "Kassa";
-            networkManager.sendMessage(requestBase);
+            StartInformationRequestMessage message = new StartInformationRequestMessage();
+            networkManager.sendMessage(message);
         }
         else
         {

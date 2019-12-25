@@ -11,14 +11,17 @@ public class CenterPanel : MonoBehaviour
     public Button friendsButton;
     public InventoryUI inventoryPanel;
     public RocketsUI rocketsPanel;
+    public FriendsUI friendsPanel;
     public Main main;
     public bool rocketsPanelUp = false;
     public bool inventoryPanelUp = false;
+    public bool friendsPanelUp = false;
     // Start is called before the first frame update
     void Start()
     {
         inventoryButton.onClick.AddListener(OnInventoryButtonClicked);
         rocketsButton.onClick.AddListener(OnRocketsButtonClicked);
+        friendsButton.onClick.AddListener(OnFriendsButtonClicked);
     }
 
     // Update is called once per frame
@@ -26,17 +29,40 @@ public class CenterPanel : MonoBehaviour
     {
 
     }
+    void OnFriendsButtonClicked()
+    {
+        inventoryPanel.refreshUI();
+        if (friendsPanelUp)
+        {
+            friendsPanelUp = false;
+            GetComponent<RectTransform>().DOAnchorPos(new Vector2(0, -56), 0.25f);
+
+            inventoryPanel.hide();
+            rocketsPanel.hide();
+            friendsPanel.show();
+        }
+        else
+        {
+            GetComponent<RectTransform>().DOAnchorPos(new Vector2(0, 56), 0.25f);
+            friendsPanelUp = true;
+            inventoryPanel.hide();
+            rocketsPanel.hide();
+            friendsPanel.show();
+        }
+    }
     void OnInventoryButtonClicked()
     {
         inventoryPanel.refreshUI();
         if (main.editing && inventoryPanelUp)
         {
             moveInventoryDown();
+            friendsPanel.hide();
             //moveInventoryDown();
         }
         else
         {
             moveinventoryPanelUp();
+            friendsPanel.hide();
         }
     }
     void OnRocketsButtonClicked()
@@ -46,12 +72,14 @@ public class CenterPanel : MonoBehaviour
         {
             moveRocketsDown();
             inventoryPanel.hide();
+            friendsPanel.hide();
             rocketsPanel.show();
         }
         else
         {
             moveRocketsUp();
             inventoryPanel.hide();
+            friendsPanel.hide();
             rocketsPanel.show();
         }
     }

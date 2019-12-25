@@ -3,6 +3,7 @@ const IsometricGrid = require("../Utils/IsometricGrid")
 const Rocket = require("../Utils/Rocket")
 const Inventory = require("../Utils/Inventory");
 const KeyMessage = require("../Messages/KeyMessage");
+const FriendsList = require("../Utils/FriendsList");
 
 const starterBaseData = "{\"width\":20,\"length\":10,\"buildings\":[{\"x\":14,\"y\":6,\"width\":2,\"height\":3,\"type\":\"Ground3x2\"},{\"x\":4,\"y\":3,\"width\":2,\"height\":3,\"type\":\"Ground3x2\"},{\"x\":5,\"y\":7,\"width\":2,\"height\":3,\"type\":\"TestStation\",\"rocket\":{\"type\":\"Rocket1\"}},{\"x\":11,\"y\":3,\"width\":2,\"height\":3,\"type\":\"TestStation\",\"rocket\":{\"type\":\"Rocket1\"}},{\"x\":15,\"y\":0,\"width\":2,\"height\":3,\"type\":\"TestStation\",\"rocket\":{\"type\":\"Rocket1\"}},{\"x\":1,\"y\":2,\"width\":2,\"height\":3,\"type\":\"TestStation\",\"rocket\":{\"type\":\"Rocket1\"}}]}"
 
@@ -31,11 +32,13 @@ class RegisterMessage extends Message {
                 if (result == null) {
                     //registers user
                     var newInventory = new Inventory();
+                    var newFriendsList = new FriendsList();
                     var newUserData = {
                         "username": this.username,
                         "password": this.password,
                         "baseData": starterBaseData,
-                        "inventory": newInventory.Serialize()
+                        "inventory": newInventory.Serialize(),
+                        "friendsList": newFriendsList.Serialize()
                     }
                     database.collection("UserData").insertOne(newUserData, (err, res) => {
                         if (err) throw err;

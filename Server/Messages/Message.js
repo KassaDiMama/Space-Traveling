@@ -18,6 +18,7 @@ class Message {
             });
             return message;
         } catch (error) {
+            console.log(error)
             console.warn("No such message: " + parsedJson.command);
         }
 

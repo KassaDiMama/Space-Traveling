@@ -2,11 +2,12 @@ const Message = require("./Message");
 const IsometricGrid = require("../Utils/IsometricGrid")
 const Rocket = require("../Utils/Rocket")
 const Inventory = require("../Utils/Inventory");
+const KeyMessage = require("../Messages/KeyMessage");
 class LoginMessage extends Message {
     constructor() {
         super();
         this.command = "LoginMessage";
-        this.username
+        this.username = null;
         this.password = null;
     }
     onReceive() {
@@ -21,12 +22,24 @@ class LoginMessage extends Message {
             database.collection("UserData").findOne(searchObj, (err, result) => {
                 if (err) {
                     console.log("No such user")
-                    resolve()
+                    resolve(this.socket.databaseQueu)
                 }
-                var password = result.password;
-                if (password = this.password) {
-                    this.socket.key = getRandomKey();
-                    //send back key TODO
+                if (result) {
+
+                    var password = result.password;
+                    if (password = this.password) {
+                        this.socket.key = this.getRandomKey();
+                        console.log(this.socket.key)
+                        this.socket.username = this.username;
+                        var keyMessage = new KeyMessage();
+                        keyMessage.key = this.socket.key;
+                        this.socket.write(keyMessage.Serialize());
+                        console.log("resolve")
+                        resolve(this.socket.databaseQueu);
+                    }
+                } else {
+                    console.log("login with no such user");
+                    resolve(this.socket.databaseQueu);
                 }
 
             })
@@ -40,8 +53,9 @@ class LoginMessage extends Message {
         var key = "";
         for (let index = 0; index < length; index++) {
             var randomChar = alphabet[Math.floor(Math.random() * alphabet.length)];
-            key.padEnd(randomChar);
+            key += randomChar;
         }
+
         return key;
     }
 }

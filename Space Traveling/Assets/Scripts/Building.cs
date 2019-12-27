@@ -99,6 +99,11 @@ public class Building : MonoBehaviour
     gridRenderPosition = gridPosition+averageOffset;
     Debug.Log("Building says : "+gridRenderPosition.x+" , "+gridRenderPosition.y);
     */
+    public void stopEditMode()
+    {
+        editing = false;
+        hideEditButtons();
+    }
     private void checkIfEdit()
     {
         if (mouseDown && lastMousePosition == Input.mousePosition && !editing)
@@ -189,6 +194,18 @@ public class Building : MonoBehaviour
                 selectedMenu.hide();
             }
         }
+    }
+    public void hideSelectedMenu()
+    {
+        if (transform.Find("SelectedMenu"))
+        {
+            SelectedMenu selectedMenu = transform.Find("SelectedMenu").GetComponent<SelectedMenu>();
+            if (selectedMenu)
+            {
+                selectedMenu.hide();
+            }
+        }
+
     }
 
 }

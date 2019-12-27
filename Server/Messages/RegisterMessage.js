@@ -4,8 +4,9 @@ const Rocket = require("../Utils/Rocket")
 const Inventory = require("../Utils/Inventory");
 const KeyMessage = require("../Messages/KeyMessage");
 const FriendsList = require("../Utils/FriendsList");
+const OutgoingRockets = require("../Utils/OutgoingRockets");
 
-const starterBaseData = "{\"width\":20,\"length\":10,\"buildings\":[{\"x\":14,\"y\":6,\"width\":2,\"height\":3,\"type\":\"Ground3x2\"},{\"x\":4,\"y\":3,\"width\":2,\"height\":3,\"type\":\"Ground3x2\"},{\"x\":5,\"y\":7,\"width\":2,\"height\":3,\"type\":\"TestStation\",\"rocket\":{\"type\":\"Rocket1\"}},{\"x\":11,\"y\":3,\"width\":2,\"height\":3,\"type\":\"TestStation\",\"rocket\":{\"type\":\"Rocket1\"}},{\"x\":15,\"y\":0,\"width\":2,\"height\":3,\"type\":\"TestStation\",\"rocket\":{\"type\":\"Rocket1\"}},{\"x\":1,\"y\":2,\"width\":2,\"height\":3,\"type\":\"TestStation\",\"rocket\":{\"type\":\"Rocket1\"}}]}"
+const starterBaseData = "{\"width\":20,\"length\":10,\"buildings\":[{\"x\":14,\"y\":6,\"width\":2,\"height\":3,\"type\":\"Ground3x2\"},{\"x\":4,\"y\":3,\"width\":2,\"height\":3,\"type\":\"Ground3x2\"},{\"x\":5,\"y\":7,\"width\":2,\"height\":3,\"type\":\"TestStation\"},{\"x\":11,\"y\":3,\"width\":2,\"height\":3,\"type\":\"TestStation\"},{\"x\":15,\"y\":0,\"width\":2,\"height\":3,\"type\":\"TestStation\"},{\"x\":1,\"y\":2,\"width\":2,\"height\":3,\"type\":\"TestStation\"}]}"
 
 class RegisterMessage extends Message {
     constructor() {
@@ -32,13 +33,16 @@ class RegisterMessage extends Message {
                 if (result == null) {
                     //registers user
                     var newInventory = new Inventory();
+                    newInventory.addItem("Rocket1", 20, "Rocket")
                     var newFriendsList = new FriendsList();
+                    var newOutgoingRockets = new OutgoingRockets();
                     var newUserData = {
                         "username": this.username,
                         "password": this.password,
                         "baseData": starterBaseData,
                         "inventory": newInventory.Serialize(),
-                        "friendsList": newFriendsList.Serialize()
+                        "friendsList": newFriendsList.Serialize(),
+                        "outgoingRockets": newOutgoingRockets.Serialize()
                     }
                     database.collection("UserData").insertOne(newUserData, (err, res) => {
                         if (err) throw err;
@@ -57,6 +61,7 @@ class RegisterMessage extends Message {
 
                 } else {
                     console.log("yo this guy already exists yoooo");
+                    resolve(this.socket.databaseQueu);
                 }
 
 

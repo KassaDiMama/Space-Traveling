@@ -11,7 +11,7 @@ public class RocketHolder : MonoBehaviour
     private Main main;
     public void Start()
     {
-        building = GetComponent<Building>();
+        //building = GetComponent<Building>();
         networkManager = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
         main = GameObject.Find("Main").GetComponent<Main>();
     }
@@ -23,8 +23,6 @@ public class RocketHolder : MonoBehaviour
     }
     public void addRocket(Rocket rocket)
     {
-
-
         this.rocket = rocket;
         this.rocket.placeOnHolder(this);
     }
@@ -75,6 +73,20 @@ public class RocketHolder : MonoBehaviour
         if (rocket != null)
         {
             rocket.placeOnHolder(this);
+        }
+
+    }
+    public void sendRocket()
+    {
+        if (rocket != null)
+        {
+            string rocketKey = rocket.key;
+            Debug.Log("RocketKey: " + rocket.key);
+            SendRocketMessage message = new SendRocketMessage();
+            message.rocketKey = rocketKey;
+            networkManager.sendMessage(message);
+            Destroy(rocket.gameObject);
+            rocket = null;
         }
 
     }

@@ -1,34 +1,55 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.SceneManagement;
 public class Main : MonoBehaviour
 {
     // Start is called before the first frame update
+    [HideInInspector]
     public Inventory inventory;
+    [HideInInspector]
     public IsometricGrid grid;
+    [HideInInspector]
     public Building currentlyEditing;
+    [HideInInspector]
     public Building currentlySelected;
     public InventoryUI inventoryUI;
+
     public Transform gridParent;
+
     public CenterPanel centerPanel;
+    [HideInInspector]
     public bool editing = false;
+    [HideInInspector]
     private NetworkManager networkManager;
+    public bool viewOnly = false;
+
     void Start()
     {
         inventory = Inventory.Deserialize(PlayerPrefs.GetString("inventoryData"));
-        Debug.Log(inventory);
+
         networkManager = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
         GameObject gridSprite = (GameObject)Resources.Load("Prefabs/Grid");
         float width = gridSprite.GetComponent<Renderer>().bounds.size.x;
         float widthWithEdgesMerged = width * 0.95f;
-        grid = IsometricGrid.Deserialize(PlayerPrefs.GetString("baseData"));
+        if (viewOnly)
+        {
+            grid = IsometricGrid.Deserialize(PlayerPrefs.GetString("friendBaseData"));
+            grid.viewOnly = true;
+        }
+        else
+        {
+            grid = IsometricGrid.Deserialize(PlayerPrefs.GetString("baseData"));
+            grid.viewOnly = false;
+        }
+
         grid.buildingPlaced.AddListener(OnBuildingPlaced);
         grid.placeGrid(gridParent);
-        if (!centerPanel.inventoryPanelUp)
-        {
-            hideGrid();
-        }
+        // if (!centerPanel.inventoryPanelUp)
+        // {
+        //     hideGrid();
+        // }
 
 
         //grid.placeBuilding((GameObject)Resources.Load("Prefabs/Ground3x2"), new Vector3(3, 3, 0));
@@ -39,7 +60,14 @@ public class Main : MonoBehaviour
         //grid.placeBuilding((GameObject)Resources.Load("Prefabs/Ground3x2"));
         // inventory.addItem("Ground3x1", 10);
         // Debug.Log(inventory.Serialize());
-        inventoryUI.refreshUI();
+        //inventoryUI.refreshUI();
+        if (PlayerPrefs.GetString("rocketDestination") != null && PlayerPrefs.GetString("rocketDestination") != "")
+        {
+            //Destination destination = Destination.Deserialize(PlayerPrefs.GetString("rocketDestination"));
+            placeRocket(PlayerPrefs.GetString("currentRocketType"), PlayerPrefs.GetString("rocketDestination"));
+            PlayerPrefs.SetString("currentRocketType", "");
+            PlayerPrefs.SetString("rocketDestination", "");
+        }
     }
 
     // Update is called once per frame
@@ -73,23 +101,32 @@ public class Main : MonoBehaviour
 
     public void onIsEditing(GameObject buildingGameObject)
     {
-        if (currentlyEditing == null)
+        if (viewOnly)
         {
             Building building = buildingGameObject.GetComponent<Building>();
-            currentlyEditing = building;
-            building.editing = true;
-            Camera.main.GetComponent<CameraScript>().canMove = false;
-
+            building.stopEditMode();
         }
         else
         {
-            onCompleteEditing(currentlyEditing.gameObject);
-            Building building = buildingGameObject.GetComponent<Building>();
-            currentlyEditing = building;
-            building.editing = true;
-            Camera.main.GetComponent<CameraScript>().canMove = false;
+            if (currentlyEditing == null)
+            {
+                Building building = buildingGameObject.GetComponent<Building>();
+                currentlyEditing = building;
+                building.editing = true;
+                Camera.main.GetComponent<CameraScript>().canMove = false;
+
+            }
+            else
+            {
+                onCompleteEditing(currentlyEditing.gameObject);
+                Building building = buildingGameObject.GetComponent<Building>();
+                currentlyEditing = building;
+                building.editing = true;
+                Camera.main.GetComponent<CameraScript>().canMove = false;
+            }
+            showGrid();
         }
-        showGrid();
+
 
         //Debug.Log("ohnono");
     }
@@ -200,6 +237,10 @@ public class Main : MonoBehaviour
             currentlySelected = building;
             building.startSelected();
         }
+        if (viewOnly)
+        {
+            building.hideSelectedMenu();
+        }
     }
     public void onRemoveBuilding(GameObject buildingGameObject)
     {
@@ -231,20 +272,47 @@ public class Main : MonoBehaviour
         editing = false;
         gridParent.localScale = new Vector3(0, 0, 0);
     }
-    public void placeRocket(string prefabName)
+    public void placeRocket(string prefabName, string destination, bool needsKey = true)
     {
         List<RocketHolder> rocketHolderList = grid.getAllEmptyRocketHolders();
         if (rocketHolderList.Count > 0)
         {
             Rocket rocket = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/" + prefabName)).GetComponent<Rocket>();
+            string key = grid.getRocketKey();
+            rocket.key = key;
+            Debug.Log("key just made: " + rocket.key);
+            rocket.destination = destination;
             RocketHolder rocketHolder = rocketHolderList[0];
-            rocketHolder.addRocket(rocket);
-            AddRocketOnBuildingMessage message = new AddRocketOnBuildingMessage();
-            message.buildingX = (int)rocketHolder.building.lastGridPosition.x;
-            message.buildingY = (int)rocketHolder.building.lastGridPosition.y;
-            message.type = rocket.type;
-            networkManager.sendMessage(message);
-            inventory.removeItem(rocket.type);
+            if (rocketHolder != null)
+            {
+                rocketHolder.addRocket(rocket);
+                Debug.Log(rocketHolder.rocket);
+                AddRocketOnBuildingMessage message = new AddRocketOnBuildingMessage();
+                message.buildingX = (int)rocketHolder.building.lastGridPosition.x;
+                message.buildingY = (int)rocketHolder.building.lastGridPosition.y;
+                message.destination = destination;
+                message.type = rocket.type;
+                message.rocketKey = key;
+                networkManager.sendMessage(message);
+                inventory.removeItem(rocket.type);
+                if (!viewOnly)
+                {
+                    PlayerPrefs.SetString("baseData", grid.Serialize());
+                }
+
+                Debug.Log(grid.Serialize());
+            }
+
+
         }
+        else
+        {
+            Debug.Log("No open rocketholders");
+        }
+    }
+    public void sendRocket(string type)
+    {
+        PlayerPrefs.SetString("currentRocketType", type);
+        SceneManager.LoadScene("PlanetMap");
     }
 }

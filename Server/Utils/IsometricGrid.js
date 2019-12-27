@@ -72,6 +72,22 @@ class IsometricGrid {
         this.buildings.splice(index, 1);
         //console.log(index)
     }
+    getBuildingByRocketKey(key) {
+        console.log("rocket key looking for: " + key);
+        var chosenBuilding = null;
+        this.buildings.forEach(building => {
+            if (building.rocket) {
+                console.log("has a rocket")
+                console.log("Rocket key: " + building.rocket.key)
+                if (building.rocket.key == key) {
+                    console.log("returning building")
+                    chosenBuilding = building;
+                    return
+                }
+            }
+        })
+        return chosenBuilding;
+    }
     Serialize() {
         var dict = {};
         dict.width = this.width;

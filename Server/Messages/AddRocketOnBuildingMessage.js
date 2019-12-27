@@ -9,6 +9,8 @@ class AddRocketOnBuildingMessage extends Message {
         this.buildingX = null;
         this.buildingY = null;
         this.type = null;
+        this.key = null;
+        this.rocketKey = null;
     }
     onReceive() {
         var AddRocketOnBuildingFunction = (resolve, reject) => {
@@ -29,7 +31,7 @@ class AddRocketOnBuildingMessage extends Message {
                     }
                     database.collection("Buildings").findOne(searchObj, (err, result2) => {
                         if (result2.isRocketHolder) {
-                            var rocket = new Rocket(this.type)
+                            var rocket = new Rocket(this.type, this.rocketKey, this.destination);
                             var inventory = Inventory.Deserialize(result.inventory);
                             if (inventory.itemPresent(rocket.type)) {
                                 inventory.removeItem(rocket.type);

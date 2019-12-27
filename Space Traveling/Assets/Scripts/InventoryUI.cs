@@ -20,10 +20,12 @@ public class InventoryUI : MonoBehaviour
     public RectTransform rocketContent;
     public RectTransform rocketContentViewPort;
     public RectTransform friendsContent;
+    private NetworkManager networkManager;
 
     void Start()
     {
         //main.inventory.addItem("Ground3x2",1);
+        networkManager = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
     }
 
     // Update is called once per frame
@@ -97,6 +99,7 @@ public class InventoryUI : MonoBehaviour
                 newFriend.transform.Find("FriendName").gameObject.GetComponent<TMP_Text>().text = friend.username;
                 newFriend.transform.SetParent(friendsContent, false);
                 newFriend.transform.localScale = Vector3.one;
+                newFriend.transform.Find("ViewBaseButton").gameObject.GetComponent<Button>().onClick.AddListener(delegate { onViewFriendBase(friend); });
             }
         }
     }
@@ -124,6 +127,13 @@ public class InventoryUI : MonoBehaviour
     {
         GetComponent<CanvasGroup>().alpha = 0f;
     }
+
+    public void onViewFriendBase(Friend friend)
+    {
+        RequestFriendsBaseMessage message = new RequestFriendsBaseMessage();
+        message.friendName = friend.username;
+        networkManager.sendMessage(message);
+    }
     /*
     public void onIsEditing(GameObject buildingGameObject){
         if(main.currentlyEditing == null){
@@ -131,7 +141,7 @@ public class InventoryUI : MonoBehaviour
             main.currentlyEditing = building;
             building.editing=true;
             Camera.main.GetComponent<CameraScript>().canMove=false;
-            
+
         }
     }
     public void onCompleteEditing(GameObject buildingGameObject){
@@ -143,9 +153,9 @@ public class InventoryUI : MonoBehaviour
             main.inventory.addItem(buildingGameObject.name.Replace("(Clone)",""));
             refreshUI();
             main.grid.removeBuilding(building);
-            
+
         }
-        
+
     }
     public void onStopEditing(GameObject buildingGameObject){
         Building building = buildingGameObject.GetComponent<Building>();
@@ -155,8 +165,8 @@ public class InventoryUI : MonoBehaviour
         main.inventory.addItem(buildingGameObject.name.Replace("(Clone)",""));
         refreshUI();
         main.grid.removeBuilding(building);
-        
 
-        
+
+
     }*/
 }

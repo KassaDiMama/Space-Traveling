@@ -24,10 +24,9 @@ class Message
     }
     public static dynamic Deserialize(string jsonString)
     {
-        Debug.Log(jsonString);
         JObject dict = JObject.Parse(jsonString);
         Type objectType = Type.GetType(dict["command"].Value<string>());
-        Debug.Log(dict["command"].Value<string>());
+        Debug.Log("Message" + dict["command"].Value<string>());
         var instantiatedObject = JsonConvert.DeserializeObject(jsonString, objectType);
         return instantiatedObject;
     }

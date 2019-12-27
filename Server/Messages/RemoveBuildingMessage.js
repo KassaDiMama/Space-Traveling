@@ -27,24 +27,29 @@ class RemoveBuildingMessage extends Message {
                 console.log("Coords: (" + this.buildingData.x + "," + this.buildingData.y + ")")
                 console.log(grid.grid[this.buildingData.x])
                 var building = grid.grid[this.buildingData.x][this.buildingData.y].building;
-                grid.removeBuilding(building);
-                var inventory = Inventory.Deserialize(result.inventory);
-                inventory.addItem(this.buildingData.type, 1, "Building");
-                var query = {
-                    "username": this.socket.username
-                };
-                var update = {
-                    $set: {
-                        "inventory": inventory.Serialize(),
-                        "baseData": grid.Serialize()
+                if (building.rocket == null) {
+                    grid.removeBuilding(building);
+                    var inventory = Inventory.Deserialize(result.inventory);
+                    inventory.addItem(this.buildingData.type, 1, "Building");
+                    var query = {
+                        "username": this.socket.username
+                    };
+                    var update = {
+                        $set: {
+                            "inventory": inventory.Serialize(),
+                            "baseData": grid.Serialize()
+                        }
                     }
-                }
-                database.collection("UserData").update(query, update, (err, res) => {
-                    if (err) throw err;
-                    console.log("Removed building")
+                    database.collection("UserData").update(query, update, (err, res) => {
+                        if (err) throw err;
+                        console.log("Removed building")
 
-                    resolve(this.socket.databaseQueu);
-                })
+                        resolve(this.socket.databaseQueu);
+                    })
+                } else {
+                    console.log("There is a rocket on this building");
+                }
+
             })
         }
         this.socket.databaseQueu.addFunction(RemoveBuildingFunction);

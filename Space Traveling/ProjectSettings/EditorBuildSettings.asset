@@ -14,4 +14,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/LoginScene.unity
     guid: 2e4e5c0983769914ba5c7550761128c8
+  - enabled: 1
+    path: Assets/Scenes/BaseViewer.unity
+    guid: 707c520f3fadcd346b12a81fec3ef7b5
+  - enabled: 1
+    path: Assets/Scenes/PlanetMap.unity
+    guid: 0a22d549ac121bd4aa25e6d101af72f9
   m_configObjects: {}

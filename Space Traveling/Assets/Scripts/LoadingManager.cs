@@ -27,8 +27,7 @@ public class LoadingManager : MonoBehaviour
         networkManager.onServerFailedToConnect.AddListener(handleOnServerFailedToConnect);
         if (networkManager.key != "")
         {
-            Debug.Log("WHAAAAAAAAAAAAAT");
-            Debug.Log(networkManager.key);
+            //Debug.Log("Key: " + networkManager.key);
             //RequestBaseMessage requestBase = new RequestBaseMessage();
             //requestBase.username = "Kassa";
             StartInformationRequestMessage message = new StartInformationRequestMessage();
@@ -36,7 +35,6 @@ public class LoadingManager : MonoBehaviour
         }
         else
         {
-            Debug.Log(networkManager.key);
             networkManager.Connect(host, port);
         }
 
@@ -64,7 +62,6 @@ public class LoadingManager : MonoBehaviour
     IEnumerator connectedFunction()
     {
         yield return new WaitForSeconds(0.1f);
-        Debug.Log(PlayerPrefs.GetString("Username") == "");
         if (PlayerPrefs.GetString("Username") != "" && PlayerPrefs.GetString("Password") != "")
         {
             LoginMessage loginMessage = new LoginMessage();

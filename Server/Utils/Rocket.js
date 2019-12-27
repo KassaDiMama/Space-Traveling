@@ -1,6 +1,8 @@
 class Rocket {
-    constructor(type) {
+    constructor(type, key, destination) {
         this.type = type;
+        this.key = key;
+        this.destination = destination;
     }
 }
 

@@ -11,7 +11,7 @@ class FriendsList {
     }
     findFriend(username) {
         this.friends.forEach(friend => {
-            if (friend.username = username) {
+            if (friend.username == username) {
                 return friend;
             }
         });

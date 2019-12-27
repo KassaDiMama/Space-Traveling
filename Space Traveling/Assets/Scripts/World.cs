@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿//using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -21,6 +22,7 @@ public class IsometricTile
     public GameObject gridPicture;
 
 
+
     public IsometricTile(int x, int y, Vector2 position)
     {
         this.x = x;
@@ -39,6 +41,7 @@ public class IsometricGrid
     private List<Building> buildings = new List<Building>();
     public BuildingPlaced buildingPlaced = new BuildingPlaced();
     public JToken buildingsJson;
+    public bool viewOnly = false;
 
     public IsometricGrid(int width, int length, float tileWidth)
     {
@@ -134,6 +137,8 @@ public class IsometricGrid
                 {
                     GameObject rocketInstance = GameObject.Instantiate((GameObject)Resources.Load("Prefabs/" + jsonBuilding["rocket"]["type"].Value<string>()));
                     rocket = rocketInstance.GetComponent<Rocket>();
+                    rocket.key = jsonBuilding["rocket"]["key"].Value<string>();
+                    rocket.destination = jsonBuilding["rocket"]["destination"].Value<string>();
                 }
 
                 placeBuilding(buildingGameObject, buildingGridPosition, rocket);
@@ -157,6 +162,23 @@ public class IsometricGrid
         }
         return rocketHolderList;
     }
+    public List<string> getAllRocketKeys()
+    {
+        List<string> keys = new List<string>();
+        foreach (Building building in buildings)
+        {
+            GameObject buildingGameObject = building.gameObject;
+            RocketHolder rocketHolder = buildingGameObject.GetComponent<RocketHolder>();
+            if (rocketHolder)
+            {
+                if (rocketHolder.rocket != null)
+                {
+                    keys.Add(rocketHolder.rocket.key);
+                }
+            }
+        }
+        return keys;
+    }
 
     public GameObject placeBuilding(GameObject buildingGameObject, Vector3 gridPosition, Rocket rocket = null)
     {
@@ -171,7 +193,6 @@ public class IsometricGrid
 
         GameObject buildingInstance = GameObject.Instantiate(buildingGameObject);
         Building building = buildingInstance.GetComponent<Building>();
-        Debug.Log(buildingGameObject.transform.Find("EditButtons").lossyScale);
         if (building.rotated)
         {
             building.OnRotation();
@@ -195,6 +216,10 @@ public class IsometricGrid
             rocketHolder.Start();
             rocketHolder.addRocket(rocket);
 
+        }
+        if (!viewOnly)
+        {
+            PlayerPrefs.SetString("baseData", this.Serialize());
         }
         return buildingInstance;
     }
@@ -247,6 +272,10 @@ public class IsometricGrid
         {
             buildingGameObject.GetComponent<RocketHolder>().updateRocketPosition();
         }
+        if (!viewOnly)
+        {
+            PlayerPrefs.SetString("baseData", this.Serialize());
+        }
         //}
     }
     public Vector3 getClosestGridPosition(Vector3 position)
@@ -267,6 +296,10 @@ public class IsometricGrid
 
         }
         buildings.Remove(building);
+        if (!viewOnly)
+        {
+            PlayerPrefs.SetString("baseData", this.Serialize());
+        }
     }
 
     public string Serialize()
@@ -287,7 +320,11 @@ public class IsometricGrid
         // }
         // dict["buildings"] = serializedBuildings;
         BaseData bd = new BaseData(this, buildings);
-        return JsonConvert.SerializeObject(bd);
+        return JsonConvert.SerializeObject(bd, Formatting.Indented, new JsonSerializerSettings
+        {
+            NullValueHandling = NullValueHandling.Ignore
+        });
+
     }
     public static IsometricGrid Deserialize(string jsonString)
     {
@@ -299,8 +336,29 @@ public class IsometricGrid
         newGrid.buildingsJson = json["buildings"];
 
 
-        Debug.Log(newGrid);
+
         return newGrid;
+    }
+    public string getRocketKey()
+    {
+        int keyLength = 10;
+        string key = "";
+        string alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+        for (int i = 0; i < keyLength; i++)
+        {
+            int randomInt = Random.Range(0, alphabet.Length - 1);
+            string character = alphabet[randomInt].ToString();
+            key += character;
+        }
+        foreach (string otherKey in getAllRocketKeys())
+        {
+            if (key == otherKey)
+            {
+                Debug.Log(key);
+                return getRocketKey();
+            }
+        }
+        return key;
     }
     /*
     public void placeBuilding(GameObject buildingGameObject){

@@ -21,7 +21,8 @@ public class RocketItemUI : MonoBehaviour
     }
     void onSend()
     {
-        main.placeRocket(prefabName);
+        //main.placeRocket(prefabName);
+        main.sendRocket(prefabName);
         main.inventoryUI.refreshUI();
     }
 }

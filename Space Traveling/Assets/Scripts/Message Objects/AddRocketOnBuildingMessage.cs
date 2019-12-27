@@ -7,6 +7,8 @@ class AddRocketOnBuildingMessage : Message
     public int buildingX;
     public int buildingY;
     public string type;
+    public string destination;
+    public string rocketKey;
 
     //public BaseData baseData;
 

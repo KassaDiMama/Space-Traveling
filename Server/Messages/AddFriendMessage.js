@@ -31,7 +31,7 @@ class AddFriendMessage extends Message {
                         username: this.socket.username
                     }
                     database.collection("UserData").findOne(searchObj, (err, result2) => {
-                        var friendsList = FriendsList.Deserialize(result.friendsList);
+                        var friendsList = FriendsList.Deserialize(result2.friendsList);
                         var friend = new Friend(this.friendName);
                         friendsList.addFriend(friend);
                         var query = {
@@ -42,7 +42,7 @@ class AddFriendMessage extends Message {
                                 "friendsList": friendsList.Serialize()
                             }
                         }
-                        database.collection("UserData").update(query, update, (err, res) => {
+                        database.collection("UserData").updateOne(query, update, (err, res) => {
                             var message = new AcceptFriendMessage();
                             message.friendsList = friendsList.Serialize()
                             this.socket.write(message.Serialize());

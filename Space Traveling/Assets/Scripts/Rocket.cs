@@ -7,6 +7,8 @@ public class Rocket : MonoBehaviour
     // Start is called before the first frame update
     public string type;
     private RocketHolder rocketHolder;
+    public string key;
+    public string destination;
     void Start()
     {
     }

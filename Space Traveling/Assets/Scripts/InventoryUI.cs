@@ -20,6 +20,7 @@ public class InventoryUI : MonoBehaviour
     public RectTransform rocketContent;
     public RectTransform rocketContentViewPort;
     public RectTransform friendsContent;
+    public RocketsUI rocketsUI;
     private NetworkManager networkManager;
 
     void Start()
@@ -41,14 +42,12 @@ public class InventoryUI : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
-        foreach (Transform child in rocketContent)
-        {
-            Destroy(child.gameObject);
-        }
+
         foreach (Transform child in friendsContent)
         {
             Destroy(child.gameObject);
         }
+        rocketsUI.refreshUI();
         foreach (InventoryItem item in main.inventory.inventoryList)
         {
             if (item.type == "Building")
@@ -76,21 +75,7 @@ public class InventoryUI : MonoBehaviour
             }
             else if (item.type == "Rocket")
             {
-                GameObject itemPrefab = (GameObject)Resources.Load("Prefabs/" + item.prefabName);
-                GameObject newItem = GameObject.Instantiate(rocketSample);
-                RocketItemUI rocketItemUI = newItem.GetComponent<RocketItemUI>();
-                rocketItemUI.prefabName = item.prefabName;
-                rocketItemUI.main = main;
 
-                //Debug.Log(itemPrefab);
-
-
-                //newItem.GetComponent<EventTrigger>().triggers.PointerDown.AddListener(delegate{itemDown(newItem);});
-                //newItem.GetComponent<EventTrigger>().PointerUp.AddListener(delegate{itemUp(newItem);});
-                newItem.transform.SetParent(rocketContent, false);
-                newItem.transform.localScale = Vector3.one;
-                //LayoutRebuilder.ForceRebuildLayoutImmediate(buildingContent);
-                newItem.transform.Find("Image").GetComponent<Image>().sprite = itemPrefab.GetComponent<Rocket>().GetComponent<SpriteRenderer>().sprite;
 
             }
             foreach (Friend friend in friendsList.friends)

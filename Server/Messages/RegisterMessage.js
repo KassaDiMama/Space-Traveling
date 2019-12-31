@@ -17,55 +17,60 @@ class RegisterMessage extends Message {
     }
     onReceive() {
         var RegisterFunction = (resolve, reject) => {
+            try {
+                console.log("username: " + this.username);
+                var database = this.db.db("SpaceTravelGame")
+                var searchObj = {
+                    username: this.username
+                }
 
-            console.log("username: " + this.username);
-            var database = this.db.db("SpaceTravelGame")
-            var searchObj = {
-                username: this.username
+                database.collection("UserData").findOne(searchObj, (err, result) => {
+                    if (err) {
+                        console.log("No such user")
+                        resolve()
+                    }
+                    console.log(result);
+                    if (result == null) {
+                        //registers user
+                        var newInventory = new Inventory();
+                        newInventory.addItem("Rocket1", 20, "Rocket")
+                        var newFriendsList = new FriendsList();
+                        var newOutgoingRockets = new OutgoingRockets();
+                        var newUserData = {
+                            "username": this.username,
+                            "password": this.password,
+                            "baseData": starterBaseData,
+                            "inventory": newInventory.Serialize(),
+                            "friendsList": newFriendsList.Serialize(),
+                            "outgoingRockets": newOutgoingRockets.Serialize()
+                        }
+                        database.collection("UserData").insertOne(newUserData, (err, res) => {
+                            if (err) throw err;
+                            console.log("WOOHOO USER ADDED");
+                            this.socket.key = this.getRandomKey();
+                            console.log(this.socket.key)
+                            this.socket.username = this.username;
+                            var keyMessage = new KeyMessage();
+                            keyMessage.key = this.socket.key;
+                            this.socket.write(keyMessage.Serialize());
+                            console.log("resolve")
+                            resolve(this.socket.databaseQueu);
+                        });
+
+
+
+                    } else {
+                        console.log("yo this guy already exists yoooo");
+                        resolve(this.socket.databaseQueu);
+                    }
+
+
+                })
+            } catch (e) {
+                console.error(e);
+                resolve(this.socket.databaseQueu)
             }
 
-            database.collection("UserData").findOne(searchObj, (err, result) => {
-                if (err) {
-                    console.log("No such user")
-                    resolve()
-                }
-                console.log(result);
-                if (result == null) {
-                    //registers user
-                    var newInventory = new Inventory();
-                    newInventory.addItem("Rocket1", 20, "Rocket")
-                    var newFriendsList = new FriendsList();
-                    var newOutgoingRockets = new OutgoingRockets();
-                    var newUserData = {
-                        "username": this.username,
-                        "password": this.password,
-                        "baseData": starterBaseData,
-                        "inventory": newInventory.Serialize(),
-                        "friendsList": newFriendsList.Serialize(),
-                        "outgoingRockets": newOutgoingRockets.Serialize()
-                    }
-                    database.collection("UserData").insertOne(newUserData, (err, res) => {
-                        if (err) throw err;
-                        console.log("WOOHOO USER ADDED");
-                        this.socket.key = this.getRandomKey();
-                        console.log(this.socket.key)
-                        this.socket.username = this.username;
-                        var keyMessage = new KeyMessage();
-                        keyMessage.key = this.socket.key;
-                        this.socket.write(keyMessage.Serialize());
-                        console.log("resolve")
-                        resolve(this.socket.databaseQueu);
-                    });
-
-
-
-                } else {
-                    console.log("yo this guy already exists yoooo");
-                    resolve(this.socket.databaseQueu);
-                }
-
-
-            })
 
         }
         this.socket.databaseQueu.addFunction(RegisterFunction);

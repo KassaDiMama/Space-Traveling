@@ -12,37 +12,44 @@ class LoginMessage extends Message {
     }
     onReceive() {
         var LoginFunction = (resolve, reject) => {
-
-            console.log(this.username);
-            var database = this.db.db("SpaceTravelGame")
-            var searchObj = {
-                username: this.username
-            }
-
-            database.collection("UserData").findOne(searchObj, (err, result) => {
-                if (err) {
-                    console.log("No such user")
-                    resolve(this.socket.databaseQueu)
+            try {
+                console.log(this.username);
+                var database = this.db.db("SpaceTravelGame")
+                var searchObj = {
+                    username: this.username
                 }
-                if (result) {
 
-                    var password = result.password;
-                    if (password = this.password) {
-                        this.socket.key = this.getRandomKey();
-                        console.log(this.socket.key)
-                        this.socket.username = this.username;
-                        var keyMessage = new KeyMessage();
-                        keyMessage.key = this.socket.key;
-                        this.socket.write(keyMessage.Serialize());
-                        console.log("resolve")
+                database.collection("UserData").findOne(searchObj, (err, result) => {
+                    if (err) {
+                        console.log("No such user")
+                        resolve(this.socket.databaseQueu)
+                    }
+                    if (result) {
+
+                        var password = result.password;
+                        if (password = this.password) {
+                            this.socket.key = this.getRandomKey();
+                            console.log(this.socket.key)
+                            this.socket.username = this.username;
+                            var keyMessage = new KeyMessage();
+                            keyMessage.key = this.socket.key;
+                            this.socket.write(keyMessage.Serialize());
+                            console.log("resolve")
+                            resolve(this.socket.databaseQueu);
+                        } else {
+                            resolve(this.socket.databaseQueu);
+                        }
+                    } else {
+                        console.log("login with no such user");
                         resolve(this.socket.databaseQueu);
                     }
-                } else {
-                    console.log("login with no such user");
-                    resolve(this.socket.databaseQueu);
-                }
 
-            })
+                })
+
+            } catch (e) {
+                console.error(e);
+                resolve(this.socket.databaseQueu)
+            }
 
         }
         this.socket.databaseQueu.addFunction(LoginFunction);

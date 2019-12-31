@@ -9,6 +9,7 @@ class RequestBaseMessage extends Message {
 
     }
     onReceive() {
+
         console.log("dis far")
         console.log("Base Requested by: " + this.socket.username);
         // var messageObject = new BaseInformation();
@@ -17,29 +18,34 @@ class RequestBaseMessage extends Message {
         // this.socket.write(messageString);
         console.log("dis far")
         var RequestBaseFunction = (resolve, reject) => {
+            try {
+                console.log("dis far")
+                var db = this.socket.databaseQueu.db;
+                console.log("dis far")
+                var database = db.db("SpaceTravelGame")
+                var searchObj = {
+                    username: this.socket.username
+                }
+                console.log("did you get this far tho??")
+                database.collection("UserData").findOne(searchObj, (err, result) => {
+                    if (err) throw err
+                    console.log("if this worked scream plz")
+                    var messageObject = new BaseInformationMessage(); //{\"width\":20,\"length\":10,\"buildings\":[{\"x\":3,\"y\":3,\"width\":2,\"height\":3,\"type\":\"Ground3x2\"},{\"x\":4,\"y\":0,\"width\":2,\"height\":3,\"type":"Ground3x2"}]}
+                    //messageObject.baseData = "{\"width\":20,\"length\":10,\"buildings\":[{\"x\":3,\"y\":3,\"width\":2,\"height\":3,\"type\":\"Ground3x2\"},{\"x\":4,\"y\":0,\"width\":2,\"height\":3,\"type\":\"Ground3x2\"}]}";
+                    messageObject.baseData = result.baseData;
+                    var messageString = messageObject.Serialize();
+                    this.socket.write(messageString);
+                    console.log("test2")
 
-            console.log("dis far")
-            var db = this.socket.databaseQueu.db;
-            console.log("dis far")
-            var database = db.db("SpaceTravelGame")
-            var searchObj = {
-                username: this.socket.username
+                    console.log("test")
+                    resolve(this.socket.databaseQueu);
+                    console.log("resolved base request")
+                })
+            } catch (e) {
+                console.error(e);
+                resolve(this.socket.databaseQueu)
             }
-            console.log("did you get this far tho??")
-            database.collection("UserData").findOne(searchObj, (err, result) => {
-                if (err) throw err
-                console.log("if this worked scream plz")
-                var messageObject = new BaseInformationMessage(); //{\"width\":20,\"length\":10,\"buildings\":[{\"x\":3,\"y\":3,\"width\":2,\"height\":3,\"type\":\"Ground3x2\"},{\"x\":4,\"y\":0,\"width\":2,\"height\":3,\"type":"Ground3x2"}]}
-                //messageObject.baseData = "{\"width\":20,\"length\":10,\"buildings\":[{\"x\":3,\"y\":3,\"width\":2,\"height\":3,\"type\":\"Ground3x2\"},{\"x\":4,\"y\":0,\"width\":2,\"height\":3,\"type\":\"Ground3x2\"}]}";
-                messageObject.baseData = result.baseData;
-                var messageString = messageObject.Serialize();
-                this.socket.write(messageString);
-                console.log("test2")
 
-                console.log("test")
-                resolve(this.socket.databaseQueu);
-                console.log("resolved base request")
-            })
 
 
         }

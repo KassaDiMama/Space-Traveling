@@ -25,6 +25,7 @@ class FriendsList
         foreach (var friend in json["friends"])
         {
             Friend newFriend = new Friend();
+            Debug.Log("user: " + friend);
             newFriend.username = friend["username"].Value<string>();
             friendsList.addFriend(newFriend);
         }

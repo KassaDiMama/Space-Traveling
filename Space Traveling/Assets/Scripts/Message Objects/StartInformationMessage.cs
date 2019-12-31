@@ -7,11 +7,13 @@ class StartInformationMessage : Message
     public string baseData;
     public string inventoryData;
     public string friendsList;
+    public string outgoingRockets;
     public override void onReceive()
     {
         PlayerPrefs.SetString("inventoryData", inventoryData);
         PlayerPrefs.SetString("baseData", baseData);
         PlayerPrefs.SetString("friendsList", friendsList);
+        PlayerPrefs.SetString("outgoingRockets", outgoingRockets);
         UnityMainThreadDispatcher.Instance().Enqueue(loadNextScene());
     }
     IEnumerator loadNextScene()

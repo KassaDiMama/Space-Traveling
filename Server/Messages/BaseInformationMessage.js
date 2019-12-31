@@ -7,16 +7,22 @@ class BaseInformationMessage extends Message {
         this.baseData = "";
     }
     onReceive() {
-        var InformationFunctionFunc = (resolve, reject) => {
-            //console.log(this.baseData)
-            var messageObject = new BaseInformationMessage();
-            messageObject.baseData = "{\"width\":20,\"length\":10,\"buildings\":[{\"x\":3,\"y\":3,\"width\":2,\"height\":3,\"type\":\"Ground3x2\"},{\"x\":4,\"y\":0,\"width\":2,\"height\":3,\"type\":\"Ground3x2\"}]}";
-            var messageString = messageObject.Serialize();
-            this.socket.write(messageString);
-            resolve(this.socket.databaseQueu)
+        var InformationFunction = (resolve, reject) => {
+            try {
+                //console.log(this.baseData)
+                var messageObject = new BaseInformationMessage();
+                messageObject.baseData = "{\"width\":20,\"length\":10,\"buildings\":[{\"x\":3,\"y\":3,\"width\":2,\"height\":3,\"type\":\"Ground3x2\"},{\"x\":4,\"y\":0,\"width\":2,\"height\":3,\"type\":\"Ground3x2\"}]}";
+                var messageString = messageObject.Serialize();
+                this.socket.write(messageString);
+                resolve(this.socket.databaseQueu)
+            } catch (e) {
+                console.error(e);
+                resolve(this.socket.databaseQueu)
+            }
+
 
         }
-        this.socket.databaseQueu.addFunction(BaseInformationFunction);
+        this.socket.databaseQueu.addFunction(InformationFunction);
     }
 }
 

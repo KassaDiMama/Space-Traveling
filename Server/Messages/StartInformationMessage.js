@@ -6,6 +6,7 @@ class StartInformationMessage extends Message {
         this.baseData = "";
         this.inventoryData = "";
         this.friendsList = "";
+        this.outgoingRockets = "";
     }
 }
 
